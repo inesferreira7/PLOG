@@ -1,24 +1,74 @@
-board([		[queen,queen,drone,vazio],
-			[queen,drone,pawn,vazio],
-			[drone,pawn,pawn,vazio],
-			[vazio,vazio,vazio,vazio],
-			[vazio,vazio,vazio,vazio],
-			[vazio,pawn,pawn,drone],
-			[vazio,pawn,drone,queen],
-			[vazio,drone,queen,queen]
+board_1([	
+			[a,queen,queen,drone,vazio],
+			[b,queen,drone,pawn,vazio],
+			[c,drone,pawn,pawn,vazio],
+			[d,vazio,vazio,vazio,vazio]
 			]).
+			
+board_2([	[e,vazio,vazio,vazio,vazio],
+			[f,vazio,pawn,pawn,drone],
+			[g,vazio,pawn,drone,queen],
+			[h,vazio,drone,queen,queen]
+			]).
+
+numbers([
+			[vazio,um,dois,tres,quatro]
+			]).
+			
+linha([		[vazio,linha,linha,linha,linha]
+			]).
+			
+display_board_numbers([B1|BS]):- nl, display_numbers(B1), display_board_numbers(BS).
+
+display_board_numbers([]):-nl.
+			
+display_numbers([E1|ES]) :- translate(E1,V), write(V), write('   '), display_numbers(ES).
+
+display_numbers([]).
+
+
+
+display_board_separa([B1|BS]):- nl, display_separa(B1), display_board_separa(BS).
+
+display_board_separa([]):-nl.
+			
+display_separa([E1|ES]) :- translate(E1,V), write(V), write('   '), display_separa(ES).
+
+display_separa([]).
+
+
+
 	 
-display_board([L1|LS]) :- display_line(L1), nl, display_board(LS).
+display_board_1([L1|LS]) :- nl, display_line(L1), nl, display_board_1(LS).
 
-display_board([]):-nl.
+display_board_1([]).
 
-display_line([E1|ES]) :- traduz(E1,V), write(V), write(' | '), display_line(ES).
+display_board_2([L1|LS]) :- nl, display_line(L1), nl, display_board_2(LS).
+
+display_board_2([]):-nl.
+
+display_line([E1|ES]) :- translate(E1,V), write(V), write(' | '), display_line(ES).
 
 display_line([]).
 
-traduz(vazio,' ').
-traduz(queen,'Q').
-traduz(drone,'D').
-traduz(pawn,'P').
 
-play_game(X):-board(X), display_board(X).
+
+translate(vazio,' ').
+translate(linha,'-').
+translate(queen,'0').
+translate(drone,'*').
+translate(pawn,'.').
+translate(a,'A').
+translate(b,'B').
+translate(c,'C').
+translate(d,'D').
+translate(e,'E').
+translate(f,'F').
+translate(g,'G').
+translate(h,'H').
+translate(um,'1').
+translate(dois,'2').
+translate(tres,'3').
+translate(quatro,'4').
+
+play_game(X,Y,Z,S):- numbers(Z), board_1(X), board_2(Y), linha(S), display_board_numbers(Z), display_board_separa(S), display_board_1(X), display_board_separa(S), display_board_2(Y).
