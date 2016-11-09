@@ -74,7 +74,7 @@ translate(quatro,'4').
 
 %%%%%% Find line with y=Letter %%%%%%
 
-head(Elem, [Head|Rs],[Head|Rs]) :- Elem = Head.
+head(Elem, [Head|Rs],Rs) :- Elem = Head.
 find_head(Elem, [Line|Rest],X):- head(Elem,Line,X); find_head(Elem,Rest,X).
 
 head_board_1(Elem,X):-board_1(B), find_head(Elem,B,X).
@@ -91,6 +91,7 @@ line_board(Elem,X):-
 					Elem = g -> head_board_2(Elem,X);
 					Elem = h -> head_board_2(Elem,X)
 					).
+
 
 
 play_game(X,Y,Z,S):- numbers(Z), board_1(X), board_2(Y), linha(S), display_board_numbers(Z), display_board_separa(S), display_board_1(X), display_board_separa(S), display_board_2(Y).
