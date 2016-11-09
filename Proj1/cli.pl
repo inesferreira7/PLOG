@@ -18,7 +18,7 @@ mainMenu :-
         printMainMenu,
         get_char(In),
         (
-          In = '1' -> write('Play game\n'), play_game(_X,_Y,_Z,_S);
+          In = '1' -> write('Play game\n'), playMenu;
           In = '2' -> write('Instructions\n'), instructionsMenu;
           In = '3' -> write('Exit\n');
 
@@ -26,6 +26,11 @@ mainMenu :-
 
         ).
 
+%%%%%%%%%%% Play menu %%%%%%%%%%%%%%
+
+playMenu:-
+                clearScreen,
+                play_game(_X,_Y,_Z,_S).
 
 %%%%%%%%%%% Instructions menu %%%%%%%%%%%%%%
 
