@@ -1,3 +1,5 @@
+:- use_module(library(lists)).
+
 board_1([
 			[a,queen,queen,drone,vazio],
 			[b,queen,drone,pawn,vazio],
@@ -92,6 +94,10 @@ line_board(Elem,X):-
 					Elem = h -> head_board_2(Elem,X)
 					).
 
+coordenates(Letter,Number,Piece):-
+				line_board(Letter,X),
+				Index is Number-1,
+				nth0(Index,X,Piece).
 
 
 play_game(X,Y,Z,S):- numbers(Z), board_1(X), board_2(Y), linha(S), display_board_numbers(Z), display_board_separa(S), display_board_1(X), display_board_separa(S), display_board_2(Y).
