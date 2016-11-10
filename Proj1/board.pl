@@ -99,5 +99,49 @@ coordenates(Letter,Number,Piece):-
 				Index is Number-1,
 				nth0(Index,X,Piece).
 
+convert(Letter,Index):-
+			(
+			(
+			Letter = a -> Index = 1;
+			Letter = b -> Index = 2;
+			Letter = c -> Index = 3;
+			Letter = d -> Index = 4;
+			Letter = e -> Index = 5;
+			Letter = f -> Index = 6;
+			Letter = g -> Index = 7;
+			Letter = h -> Index = 8)
+			; write('Letra invalida')
+			).
+
+inside_board(X,Y):-
+				convert(Y,Index),
+				(
+				(X<1 ; X>4; Index>8; Index<1)
+				-> write('Coordenadas invalidas')
+				; write('Coordenadas validas \n')
+				).
+
+check_drone_position(Xi,Yi,Xf,Yf):-
+				inside_board(Xf,Yf),
+				convert(Yi,Indexi),
+				convert(Yf,Indexf),
+				(
+				(Xf - Xi > 2 ; Indexf - Indexi > 2 ; Xi - Xf > 2 ; Indexi - Indexf > 2)
+				-> write('Jogada invalida para drone')
+				; write('Jogada valida para drone')
+				).
+
+check_pawn_position(Xi,Yi,Xf,Yf):-
+				inside_board(Xf,Yf),
+				convert(Yi,Indexi),
+				convert(Yf,Indexf),
+				Dx is (Xf - Xi),
+				Dy is (Indexf - Indexi),
+				(
+				((Dx = -1 , Dy = -1) ; (Dx = -1 , Dy = 1) ; (Dx = 1 , Dy = 1) ; (Dx = 1 , Dy = -1))
+				-> write('Jogada valida para peao')
+				; write('Jogada invalida para peao')
+				).
+
 
 play_game(X,Y,Z,S):- numbers(Z), board_1(X), board_2(Y), linha(S), display_board_numbers(Z), display_board_separa(S), display_board_1(X), display_board_separa(S), display_board_2(Y).
