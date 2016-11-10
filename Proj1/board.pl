@@ -140,7 +140,7 @@ check_drone_position(Xi,Yi,Xf,Yf):-
 				inside_board(Xf,Indexf),
 				(
 				(Xf - Xi > 2 ; Indexf - Indexi > 2 ; Xi - Xf > 2 ; Indexi - Indexf > 2)
-				-> write('Jogada invalida para drone')
+				-> (write('Jogada invalida para drone'),!)
 				; write('Jogada valida para drone')
 				).
 
@@ -217,7 +217,7 @@ move_drone(Xi,Yi,Xf,Yf,Bo):-
 				(
 				P = 1 -> write('Tried to move a piece to a position where there is a player 1 piece. ');
 				P = 2 -> write('Peca do player 2');
-				P = 3 -> (write('mexe'), board_1(Bi), replace(Bi,Yi,Xi,vazio,Bint), replace(Bint,Yf,Xf,drone,Bo))
+				P = 3 -> (write('mexe'), board_1(Bi), convert(Yi, Numi), Indexi is (Numi - 1), replace(Bi,Indexi,Xi,vazio,Bint), convert(Yf, Numf), Indexf is (Numf - 1), replace(Bint,Indexf,Xf,drone,Bo))
 				).
 
 replace( L , X , Y , Z , R ) :-
