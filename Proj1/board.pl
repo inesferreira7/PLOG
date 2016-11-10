@@ -154,13 +154,6 @@ check_queen_position(Xi,Yi,Xf,Yf):-
 				; write('Jogada invalida para rainha')
 				).
 
-check_piece(Letter, Number,X):-
-				coordenates(Letter,Number,Piece),
-				(
-				(Piece = vazio) -> write('Pode continuar')
-				; check_owner(Letter,X)
-				).
-
 check_owner(Letter,X):-
 				convert(Letter,Y),
 				(
@@ -169,26 +162,39 @@ check_owner(Letter,X):-
 				).
 
 
-move_pawn(Xi,Yi,Xf,Yf):-
-				check_pawn_position(Xi,Yi,Xf,Yf), %verifica se o peao pode mover-se para xf,yf
-				check_piece(Yf,Xf,X), %verifica o que se encontra no quadrado xf,yf
+
+
+check_piece(Letter, Number,X):-
+				coordenates(Letter,Number,Piece),
 				(
-				X = 1 -> write('A peca e do player 1');
-				X = 2 -> write('A peca e do player 2')
+				(Piece = vazio) -> write('Pode continuar')
+				; check_owner(Letter,X)
+				).
+
+
+
+move_pawn(Xi,Yi,Xf,Yf,Bo):-
+				check_pawn_position(Xi,Yi,Xf,Yf),
+				check_piece(Yf,Xf,X),
+				(
+				X = 1 -> (board_1(Bi) , replace(Bi,Xi,Yi,vazio,Bint), replace(Bint,Xf,Yf,pawn,Bo));
+				X = 2 -> write("Peça do player 2 ")
 				).
 
 replace( L , X , Y , Z , R ) :-
+				convert(Y,Num),
+				Index is (Num-1),
 				append(RowPfx,[Row|RowSfx],L),
 				length(RowPfx,X) ,
 				append(ColPfx,[_|ColSfx],Row) ,
-				length(ColPfx,Y) ,
+				length(ColPfx,Index) ,
 				append(ColPfx,[Z|ColSfx],RowNew) ,
 				append(RowPfx,[RowNew|RowSfx],R)
 				.
 
 
 
-test(X,Y,Z,R):-
-		board_1(L), replace(L,X,Y,Z,R).
+% test(X,Y,Z,R):-
+	%	board_1(L), replace(L,X,Y,Z,R).
 
 play_game(X,Y,Z,S):- numbers(Z), board_1(X), board_2(Y), linha(S), display_board_numbers(Z), display_board_separa(S), display_board_1(X), display_board_separa(S), display_board_2(Y).
