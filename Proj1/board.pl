@@ -177,7 +177,7 @@ move_pawn(Xi,Yi,Xf,Yf,Bo):-
 				check_pawn_position(Xi,Yi,Xf,Yf),
 				check_piece(Yf,Xf,X),
 				(
-				X = 1 -> write("Peça do player 1 ");
+				X = 1 -> write("Tried to move to a position where there is a player 1 piece. ");
 				X = 2 -> write("Peça do player 2 ");
 				X = 3 -> (board_1(Bi) , replace(Bi,Xi,Yi,vazio,Bint), replace(Bint,Xf,Yf,pawn,Bo))
 
@@ -195,8 +195,5 @@ replace( L , X , Y , Z , R ) :-
 				.
 
 
-
-% test(X,Y,Z,R):-
-	%	board_1(L), replace(L,X,Y,Z,R).
 
 play_game(X,Y,Z,S):- numbers(Z), board_1(X), board_2(Y), linha(S), display_board_numbers(Z), display_board_separa(S), display_board_1(X), display_board_separa(S), display_board_2(Y).
