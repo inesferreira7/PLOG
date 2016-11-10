@@ -167,7 +167,7 @@ check_owner(Letter,X):-
 check_piece(Letter, Number,X):-
 				coordenates(Letter,Number,Piece),
 				(
-				(Piece = vazio) -> write('Pode continuar')
+				(Piece = vazio) -> X is 3
 				; check_owner(Letter,X)
 				).
 
@@ -177,8 +177,10 @@ move_pawn(Xi,Yi,Xf,Yf,Bo):-
 				check_pawn_position(Xi,Yi,Xf,Yf),
 				check_piece(Yf,Xf,X),
 				(
-				X = 1 -> (board_1(Bi) , replace(Bi,Xi,Yi,vazio,Bint), replace(Bint,Xf,Yf,pawn,Bo));
-				X = 2 -> write("Peça do player 2 ")
+				X = 1 -> write("Peça do player 1 ");
+				X = 2 -> write("Peça do player 2 ");
+				X = 3 -> (board_1(Bi) , replace(Bi,Xi,Yi,vazio,Bint), replace(Bint,Xf,Yf,pawn,Bo))
+
 				).
 
 replace( L , X , Y , Z , R ) :-
