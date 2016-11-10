@@ -113,6 +113,20 @@ convert(Letter,Index):-
 			; write('Letra invalida')
 			).
 
+convert_to_letter(Index,Letter):-
+			(
+			(
+			Index = 1 -> Letter = a;
+			Index = 2 -> Letter = b;
+			Index = 3 -> Letter = c;
+			Index = 4 -> Letter = d;
+			Index = 5 -> Letter = e;
+			Index = 6 -> Letter = f;
+			Index = 7 -> Letter = g;
+			Index = 8 -> Letter = h)
+			; write('Numero invalido')
+			).
+
 inside_board(X,Index):-
 				(
 				(X<1 ; X>4; Index>8; Index<1)
@@ -177,10 +191,33 @@ move_pawn(Xi,Yi,Xf,Yf,Bo):-
 				check_pawn_position(Xi,Yi,Xf,Yf),
 				check_piece(Yf,Xf,X),
 				(
-				X = 1 -> write("Tried to move to a position where there is a player 1 piece. ");
-				X = 2 -> write("Peça do player 2 ");
+				X = 1 -> write('Tried to move to a position where there is a player 1 piece. ');
+				X = 2 -> write('Peça do player 2 ');
 				X = 3 -> (board_1(Bi) , replace(Bi,Xi,Yi,vazio,Bint), replace(Bint,Xf,Yf,pawn,Bo))
 
+				).
+
+check_path_drone(Xi,Yi,Xf,Yf,Piece):-
+				convert(Yi,Indexi),
+				convert(Yf,Indexf),
+				Dx is abs(Xf-Xi),
+				Dy is abs(Indexf-Indexi),
+				(
+				Dx = 1 -> check_piece(Yf,Xf,Piece);
+				Dy = 1 -> check_piece(Yf,Xf,Piece);
+				(Dx = 2, Xf > Xi)-> (check_piece(Yf,Xf,Piece), X1 is (Xf-1), check_piece(Yf,X1,Piece));
+				(Dx = 2, Xf < Xi)-> (check_piece(Yf,Xf,Piece), X1 is (Xf+1), check_piece(Yf,X1,Piece));
+				(Dy = 2, Indexf > Indexi)-> (check_piece(Yf,Xf,Piece), Y1 is (Indexf-1), convert_to_letter(Y1,L), check_piece(L,Xf,Piece));
+				(Dy = 2, Indexf < Indexi)-> (check_piece(Yf,Xf,Piece), Y1 is (Indexf+1), convert_to_letter(Y1,L), check_piece(L,Xf,Piece))
+				).
+
+move_drone(Xi,Yi,Xf,Yf,Bo):-
+				check_drone_position(Xi,Yi,Xf,Yf),
+				check_path_drone(Xi,Yi,Xf,Yf,P),
+				(
+				P = 1 -> write('Tried to move a piece to a position where there is a player 1 piece. ');
+				P = 2 -> write('Peca do player 2');
+				P = 3 -> (write('mexe'), board_1(Bi), replace(Bi,Xi,Yi,vazio,Bint), replace(Bint,Xf,Yf,drone,Bo))
 				).
 
 replace( L , X , Y , Z , R ) :-
