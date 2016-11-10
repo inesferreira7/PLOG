@@ -113,8 +113,7 @@ convert(Letter,Index):-
 			; write('Letra invalida')
 			).
 
-inside_board(X,Y):-
-				convert(Y,Index),
+inside_board(X,Index):-
 				(
 				(X<1 ; X>4; Index>8; Index<1)
 				-> write('Coordenadas invalidas')
@@ -122,9 +121,9 @@ inside_board(X,Y):-
 				).
 
 check_drone_position(Xi,Yi,Xf,Yf):-
-				inside_board(Xf,Yf),
 				convert(Yi,Indexi),
 				convert(Yf,Indexf),
+				inside_board(Xf,Indexf),
 				(
 				(Xf - Xi > 2 ; Indexf - Indexi > 2 ; Xi - Xf > 2 ; Indexi - Indexf > 2)
 				-> write('Jogada invalida para drone')
@@ -132,16 +131,64 @@ check_drone_position(Xi,Yi,Xf,Yf):-
 				).
 
 check_pawn_position(Xi,Yi,Xf,Yf):-
-				inside_board(Xf,Yf),
 				convert(Yi,Indexi),
 				convert(Yf,Indexf),
+				inside_board(Xf,Indexf),
 				Dx is (Xf - Xi),
 				Dy is (Indexf - Indexi),
 				(
 				((Dx = -1 , Dy = -1) ; (Dx = -1 , Dy = 1) ; (Dx = 1 , Dy = 1) ; (Dx = 1 , Dy = -1))
-				-> write('Jogada valida para peao')
-				; write('Jogada invalida para peao')
+				-> write('Jogada valida para peao\n')
+				; write('Jogada invalida para peao\n')
 				).
 
+check_queen_position(Xi,Yi,Xf,Yf):-
+				inside_board(Xf,Yf),
+				convert(Yi,Indexi),
+				convert(Yf,Indexf),
+				Dx is abs(Xf - Xi),
+				Dy is abs(Indexf - Indexi),
+				(
+				((Xi = Xf , Indexi \= Indexf) ; (Xi \= Xf , Indexi = Indexf) ; Dx = Dy)
+				->write('Jogada valida para rainha')
+				; write('Jogada invalida para rainha')
+				).
+
+check_piece(Letter, Number,X):-
+				coordenates(Letter,Number,Piece),
+				(
+				(Piece = vazio) -> write('Pode continuar')
+				; check_owner(Letter,X)
+				).
+
+check_owner(Letter,X):-
+				convert(Letter,Y),
+				(
+				Y =< 4 -> X is 1;
+				Y > 4 -> X is 2
+				).
+
+
+move_pawn(Xi,Yi,Xf,Yf):-
+				check_pawn_position(Xi,Yi,Xf,Yf), %verifica se o peao pode mover-se para xf,yf
+				check_piece(Yf,Xf,X), %verifica o que se encontra no quadrado xf,yf
+				(
+				X = 1 -> write('A peca e do player 1');
+				X = 2 -> write('A peca e do player 2')
+				).
+
+replace( L , X , Y , Z , R ) :-
+				append(RowPfx,[Row|RowSfx],L),
+				length(RowPfx,X) ,
+				append(ColPfx,[_|ColSfx],Row) ,
+				length(ColPfx,Y) ,
+				append(ColPfx,[Z|ColSfx],RowNew) ,
+				append(RowPfx,[RowNew|RowSfx],R)
+				.
+
+
+
+test(X,Y,Z,R):-
+		board_1(L), replace(L,X,Y,Z,R).
 
 play_game(X,Y,Z,S):- numbers(Z), board_1(X), board_2(Y), linha(S), display_board_numbers(Z), display_board_separa(S), display_board_1(X), display_board_separa(S), display_board_2(Y).
