@@ -1,23 +1,18 @@
 :- use_module(library(lists)).
 
-board_1([
+board([
 			[a,queen,queen,drone,vazio],
 			[b,queen,drone,pawn,vazio],
 			[c,drone,pawn,pawn,vazio],
-			[d,vazio,vazio,pawn,vazio]
-			]).
-
-board_2([	[e,vazio,vazio,vazio,vazio],
-			[f,vazio,pawn,pawn,drone],
-			[g,vazio,pawn,drone,queen],
-			[h,vazio,drone,queen,queen]
+			[d,vazio,vazio,vazio,vazio],
+      [e,vazio,vazio,vazio,vazio],
+      [f,vazio,pawn,pawn,drone],
+      [g,vazio,pawn,drone,queen],
+      [h,vazio,drone,queen,queen]
 			]).
 
 numbers([
 			[vazio,um,dois,tres,quatro]
-			]).
-
-linha([		[vazio,linha,linha,linha,linha]
 			]).
 
 
@@ -30,25 +25,20 @@ display_numbers([E1|ES]) :- translate(E1,V), write(V), write('   '), display_num
 display_numbers([]).
 
 
+display_board([L1|LS], N) :-
+        nl,
+        (
+        N = 4 -> (write('  ----------------\n'),nl, display_line(L1));
+        display_line(L1)),
+        N1 is N+1,
+        nl,
+        display_board(LS, N1)
+        .
 
-display_board_separa([B1|BS]):- nl, display_separa(B1), display_board_separa(BS).
 
-display_board_separa([]):-nl.
+display_board([],0).
 
-display_separa([E1|ES]) :- translate(E1,V), write(V), write('   '), display_separa(ES).
-
-display_separa([]).
-
-
-
-
-display_board_1([L1|LS]) :- nl, display_line(L1), nl, display_board_1(LS).
-
-display_board_1([]).
-
-display_board_2([L1|LS]) :- nl, display_line(L1), nl, display_board_2(LS).
-
-display_board_2([]):-nl.
+display_all(Board):-numbers(N), display_board_numbers(N), display_board(Board,0).
 
 display_line([E1|ES]) :- translate(E1,V), write(V), write(' | '), display_line(ES).
 
@@ -79,20 +69,8 @@ translate(quatro,'4').
 head(Elem, [Head|Rs],Rs) :- Elem = Head.
 find_head(Elem, [Line|Rest],X):- head(Elem,Line,X); find_head(Elem,Rest,X).
 
-head_board_1(Elem,X):-board_1(B), find_head(Elem,B,X).
-head_board_2(Elem,X):-board_2(B), find_head(Elem,B,X).
+line_board(Elem,X):-board(B), find_head(Elem,B,X).
 
-line_board(Elem,X):-
-					(
-					Elem = a -> head_board_1(Elem,X);
-					Elem = b -> head_board_1(Elem,X);
-					Elem = c -> head_board_1(Elem,X);
-					Elem = d -> head_board_1(Elem,X);
-					Elem = e -> head_board_2(Elem,X);
-					Elem = f -> head_board_2(Elem,X);
-					Elem = g -> head_board_2(Elem,X);
-					Elem = h -> head_board_2(Elem,X)
-					).
 
 coordenates(Letter,Number,Piece):-
 				line_board(Letter,X),
@@ -194,7 +172,7 @@ move_pawn(Xi,Yi,Xf,Yf,Bo):-
 				(
 				X = 1 -> write('Tried to move to a position where there is a player 1 piece. ');
 				X = 2 -> write('Peça do player 2 ');
-				X = 3 -> (board_1(Bi) , convert(Yi, Numi), Indexi is (Numi - 1), replace(Bi,Indexi,Xi,vazio,Bint), convert(Yf,Numf), Indexf is (Numf - 1), replace(Bint,Indexf,Xf,pawn,Bo))
+				X = 3 -> (board(Bi) , convert(Yi, Numi), Indexi is (Numi - 1), replace(Bi,Indexi,Xi,vazio,Bint), convert(Yf,Numf), Indexf is (Numf - 1), replace(Bint,Indexf,Xf,pawn,Bo))
 
 				).
 
@@ -218,8 +196,10 @@ move_drone(Xi,Yi,Xf,Yf,Bo):-
 				(
 				(P1 = 1 ; P2 = 1) -> write('path with pieces (1)');
 				(P1 = 2 ; P2 = 2) -> write('path with pieces (2)');
-				(P1 = 3 , P2 = 3 )-> (write('empty path, move bitch'), board_1(Bi), convert(Yi, Numi), Indexi is (Numi - 1), replace(Bi,Indexi,Xi,vazio,Bint), convert(Yf, Numf), Indexf is (Numf - 1), replace(Bint,Indexf,Xf,drone,Bo))
+				(P1 = 3 , P2 = 3 )-> (write('move ok'), board(Bi), convert(Yi, Numi), Indexi is (Numi - 1), replace(Bi,Indexi,Xi,vazio,Bint), convert(Yf, Numf), Indexf is (Numf - 1), replace(Bint,Indexf,Xf,drone,Bo))
 				).
+
+test(Xi,Yi,Xf,Yf):-move_drone(Xi,Yi,Xf,Yf,Board), display_all(Board).
 
 replace( L , X , Y , Z , R ) :-
 				append(RowPfx,[Row|RowSfx],L),
@@ -229,8 +209,3 @@ replace( L , X , Y , Z , R ) :-
 				append(ColPfx,[Z|ColSfx],RowNew) ,
 				append(RowPfx,[RowNew|RowSfx],R)
 				.
-
-test(X,Y,Z,R):- board_1(B), replace(B,X,Y,Z,R).
-
-
-play_game(X,Y,Z,S):- numbers(Z), board_1(X), board_2(Y), linha(S), display_board_numbers(Z), display_board_separa(S), display_board_1(X), display_board_separa(S), display_board_2(Y).
