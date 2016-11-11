@@ -142,7 +142,7 @@ check_drone_position(Xi,Yi,Xf,Yf):-
 				(Xf - Xi > 2 ; Indexf - Indexi > 2 ; Xi - Xf > 2 ; Indexi - Indexf > 2)
 				-> (write('Jogada invalida para drone \n'),!)
 				; write('Jogada valida para drone \n')
-				).
+
 
 check_pawn_position(Xi,Yi,Xf,Yf):-
 				convert(Yi,Indexi),
@@ -218,6 +218,7 @@ move_drone(Xi,Yi,Xf,Yf,Bo):-
 				(P1 = 1 ; P2 = 1) -> write('path with pieces (1)');
 				(P1 = 2 ; P2 = 2) -> write('path with pieces (2)');
 				(P1 = 3 , P2 = 3 )-> (write('empty path, move bitch'), board_1(Bi), convert(Yi, Numi), Indexi is (Numi - 1), replace(Bi,Indexi,Xi,vazio,Bint), convert(Yf, Numf), Indexf is (Numf - 1), replace(Bint,Indexf,Xf,drone,Bo))
+
 				).
 
 replace( L , X , Y , Z , R ) :-
