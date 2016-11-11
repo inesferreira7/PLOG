@@ -163,15 +163,27 @@ check_piece(Letter, Number,X):-
 				; check_owner(Letter,X)
 				).
 
-move_pawn(Xi,Yi,Xf,Yf,Bo):-
-				check_pawn_position(Xi,Yi,Xf,Yf),
-				check_piece(Yf,Xf,X),
+move_pawn(Xi,Yi,Xf,Yf):-
+				coordenates(Yi,Xi,InitialPiece),
 				(
-				X = 1 -> write('Tried to move to a position where there is a player 1 piece. ');
-				X = 2 -> write('Peça do player 2 ');
-				X = 3 -> (board(Bi) , convert(Yi, Numi), Indexi is (Numi - 1), replace(Bi,Indexi,Xi,vazio,Bint), convert(Yf,Numf), Indexf is (Numf - 1), replace(Bint,Indexf,Xf,pawn,Bo),display_board(Bo,0))
-
+				InitialPiece = pawn ->(check_pawn_position(Xi,Yi,Xf,Yf),check_piece(Yf,Xf,X),
+				(
+				X = 1 -> write('path with pieces (1)');
+				X = 2 -> write('path with pieces (2)');
+				X = 3 -> (make_move(Xi,Yi,Xf,Yf,pawn,Bo), display_all(Bo))
+				)
+				);
+				write('That piece you selected is not a pawn, you can not move it! ')
 				).
+
+make_move(Xi,Yi,Xf,Yf,Piece,Bo):-
+				board(Bi) ,
+				convert(Yi, Numi),
+				convert(Yf,Numf),
+				Indexi is (Numi - 1),
+				Indexf is (Numf - 1),
+				replace(Bi,Indexi,Xi,vazio,Bint),
+				replace(Bint,Indexf,Xf,Piece,Bo).
 
 check_path_drone(Xi,Yi,Xf,Yf,Piece,Piece2):-
 				convert(Yi,Indexi),
@@ -190,19 +202,18 @@ check_path_drone(Xi,Yi,Xf,Yf,Piece,Piece2):-
 move_drone(Xi,Yi,Xf,Yf):-
 				coordenates(Yi,Xi,InitialPiece),
 				(
-				InitialPiece = drone ->(check_drone_position(Xi,Yi,Xf,Yf),
-																check_path_drone(Xi,Yi,Xf,Yf,P1,P2),
-																	(
-																		(P1 = 1 ; P2 = 1) -> write('path with pieces (1)');
-																		(P1 = 2 ; P2 = 2) -> write('path with pieces (2)');
-																		(P1 = 3 , P2 = 3 )-> update_drone(Xi,Yi,Xf,Yf,Bo), display_all(Bo)
-																	)
-																);
+				InitialPiece = drone ->(check_drone_position(Xi,Yi,Xf,Yf), check_path_drone(Xi,Yi,Xf,Yf,P1,P2),
+				(
+				(P1 = 1 ; P2 = 1) -> write('path with pieces (1)');
+				(P1 = 2 ; P2 = 2) -> write('path with pieces (2)');
+				(P1 = 3 , P2 = 3 )-> make_move(Xi,Yi,Xf,Yf,drone,Bo), display_all(Bo)
+				)
+				);
 				write('That piece you selected is not a drone, you can not move it! ')
 				)
 				.
 
-update_drone(Xi,Yi,Xf,Yf,Bo):-
+/**update_drone(Xi,Yi,Xf,Yf,Bo):-
       board(Bi),
       convert(Yi,Numi),
       convert(Yf,Numf),
@@ -210,7 +221,7 @@ update_drone(Xi,Yi,Xf,Yf,Bo):-
       Indexf is (Numf - 1),
       replace(Bi,Indexi,Xi,vazio,Bint),
       replace(Bint,Indexf,Xf,drone,Bo)
-      .
+      .**/
 
 replace( L , X , Y , Z , R ) :-
 				append(RowPfx,[Row|RowSfx],L),
