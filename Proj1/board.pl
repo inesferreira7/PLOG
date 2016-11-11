@@ -4,7 +4,7 @@ board_1([
 			[a,queen,queen,drone,vazio],
 			[b,queen,drone,pawn,vazio],
 			[c,drone,pawn,pawn,vazio],
-			[d,vazio,vazio,vazio,vazio]
+			[d,vazio,vazio,pawn,vazio]
 			]).
 
 board_2([	[e,vazio,vazio,vazio,vazio],
@@ -96,7 +96,7 @@ line_board(Elem,X):-
 
 coordenates(Letter,Number,Piece):-
 				line_board(Letter,X),
-				Index is Number-1,
+				Index is (Number-1),
 				nth0(Index,X,Piece).
 
 convert(Letter,Index):-
@@ -130,7 +130,7 @@ convert_to_letter(Index,Letter):-
 inside_board(X,Index):-
 				(
 				(X<1 ; X>4; Index>8; Index<1)
-				-> write('Coordenadas invalidas')
+				-> write('Coordenadas invalidas \n')
 				; write('Coordenadas validas \n')
 				).
 
@@ -140,8 +140,8 @@ check_drone_position(Xi,Yi,Xf,Yf):-
 				inside_board(Xf,Indexf),
 				(
 				(Xf - Xi > 2 ; Indexf - Indexi > 2 ; Xi - Xf > 2 ; Indexi - Indexf > 2)
-				-> write('Jogada invalida para drone')
-				; write('Jogada valida para drone')
+				-> (write('Jogada invalida para drone \n'),!)
+				; write('Jogada valida para drone \n')
 				).
 
 check_pawn_position(Xi,Yi,Xf,Yf):-
@@ -193,44 +193,43 @@ move_pawn(Xi,Yi,Xf,Yf,Bo):-
 				(
 				X = 1 -> write('Tried to move to a position where there is a player 1 piece. ');
 				X = 2 -> write('Peça do player 2 ');
-				X = 3 -> (board_1(Bi) , replace(Bi,Xi,Yi,vazio,Bint), replace(Bint,Xf,Yf,pawn,Bo))
+				X = 3 -> (board_1(Bi) , convert(Yi, Numi), Indexi is (Numi - 1), replace(Bi,Indexi,Xi,vazio,Bint), convert(Yf,Numf), Indexf is (Numf - 1), replace(Bint,Indexf,Xf,pawn,Bo))
 
 				).
 
-check_path_drone(Xi,Yi,Xf,Yf,Piece):-
+check_path_drone(Xi,Yi,Xf,Yf,Piece,Piece2):-
 				convert(Yi,Indexi),
 				convert(Yf,Indexf),
 				Dx is abs(Xf-Xi),
 				Dy is abs(Indexf-Indexi),
 				(
-				Dx = 1 -> check_piece(Yf,Xf,Piece);
-				Dy = 1 -> check_piece(Yf,Xf,Piece);
-				(Dx = 2, Xf > Xi)-> (check_piece(Yf,Xf,Piece), X1 is (Xf-1), check_piece(Yf,X1,Piece));
-				(Dx = 2, Xf < Xi)-> (check_piece(Yf,Xf,Piece), X1 is (Xf+1), check_piece(Yf,X1,Piece));
-				(Dy = 2, Indexf > Indexi)-> (check_piece(Yf,Xf,Piece), Y1 is (Indexf-1), convert_to_letter(Y1,L), check_piece(L,Xf,Piece));
-				(Dy = 2, Indexf < Indexi)-> (check_piece(Yf,Xf,Piece), Y1 is (Indexf+1), convert_to_letter(Y1,L), check_piece(L,Xf,Piece))
+				Dx = 1  -> (Piece2 is 3 ,  check_piece(Yf,Xf,Piece));
+				Dy = 1 -> (Piece2 is 3 , check_piece(Yf,Xf,Piece));
+				(Dx = 2, Xf > Xi)-> (check_piece(Yf,Xf,Piece), X1 is (Xf-1), check_piece(Yf,X1,Piece2));
+				(Dx = 2, Xf < Xi)-> (check_piece(Yf,Xf,Piece), X1 is (Xf+1), check_piece(Yf,X1,Piece2));
+				(Dy = 2, Indexf > Indexi)-> (check_piece(Yf,Xf,Piece), Y1 is (Indexf-1), convert_to_letter(Y1,L), check_piece(L,Xf,Piece2));
+				(Dy = 2, Indexf < Indexi)-> (check_piece(Yf,Xf,Piece), Y1 is (Indexf+1), convert_to_letter(Y1,L), check_piece(L,Xf,Piece2))
 				).
 
 move_drone(Xi,Yi,Xf,Yf,Bo):-
 				check_drone_position(Xi,Yi,Xf,Yf),
-				check_path_drone(Xi,Yi,Xf,Yf,P),
+				check_path_drone(Xi,Yi,Xf,Yf,P1,P2),
 				(
-				P = 1 -> write('Tried to move a piece to a position where there is a player 1 piece. ');
-				P = 2 -> write('Peca do player 2');
-				P = 3 -> (write('mexe'), board_1(Bi), replace(Bi,Xi,Yi,vazio,Bint), replace(Bint,Xf,Yf,drone,Bo))
+				(P1 = 1 ; P2 = 1) -> write('path with pieces (1)');
+				(P1 = 2 ; P2 = 2) -> write('path with pieces (2)');
+				(P1 = 3 , P2 = 3 )-> (write('empty path, move bitch'), board_1(Bi), convert(Yi, Numi), Indexi is (Numi - 1), replace(Bi,Indexi,Xi,vazio,Bint), convert(Yf, Numf), Indexf is (Numf - 1), replace(Bint,Indexf,Xf,drone,Bo))
 				).
 
 replace( L , X , Y , Z , R ) :-
-				convert(Y,Num),
-				Index is (Num-1),
 				append(RowPfx,[Row|RowSfx],L),
 				length(RowPfx,X) ,
 				append(ColPfx,[_|ColSfx],Row) ,
-				length(ColPfx,Index) ,
+				length(ColPfx,Y) ,
 				append(ColPfx,[Z|ColSfx],RowNew) ,
 				append(RowPfx,[RowNew|RowSfx],R)
 				.
 
+test(X,Y,Z,R):- board_1(B), replace(B,X,Y,Z,R).
 
 
 play_game(X,Y,Z,S):- numbers(Z), board_1(X), board_2(Y), linha(S), display_board_numbers(Z), display_board_separa(S), display_board_1(X), display_board_separa(S), display_board_2(Y).
