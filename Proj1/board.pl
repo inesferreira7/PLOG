@@ -156,17 +156,12 @@ check_owner(Letter,X):-
 				Y > 4 -> X is 2
 				).
 
-
-
-
 check_piece(Letter, Number,X):-
 				coordenates(Letter,Number,Piece),
 				(
 				(Piece = vazio) -> X is 3
 				; check_owner(Letter,X)
 				).
-
-
 
 move_pawn(Xi,Yi,Xf,Yf,Bo):-
 				check_pawn_position(Xi,Yi,Xf,Yf),
@@ -192,16 +187,20 @@ check_path_drone(Xi,Yi,Xf,Yf,Piece,Piece2):-
 				(Dy = 2, Indexf < Indexi)-> (check_piece(Yf,Xf,Piece), Y1 is (Indexf+1), convert_to_letter(Y1,L), check_piece(L,Xf,Piece2))
 				).
 
-
-
 move_drone(Xi,Yi,Xf,Yf):-
-				check_drone_position(Xi,Yi,Xf,Yf),
-				check_path_drone(Xi,Yi,Xf,Yf,P1,P2),
+				coordenates(Yi,Xi,InitialPiece),
 				(
-				(P1 = 1 ; P2 = 1) -> write('path with pieces (1)');
-				(P1 = 2 ; P2 = 2) -> write('path with pieces (2)');
-				(P1 = 3 , P2 = 3 )-> (write('move ok'), update_drone(Xi,Yi,Xf,Yf,Bo), display_all(Bo))
-				).
+				InitialPiece = drone ->(check_drone_position(Xi,Yi,Xf,Yf),
+																check_path_drone(Xi,Yi,Xf,Yf,P1,P2),
+																	(
+																		(P1 = 1 ; P2 = 1) -> write('path with pieces (1)');
+																		(P1 = 2 ; P2 = 2) -> write('path with pieces (2)');
+																		(P1 = 3 , P2 = 3 )-> update_drone(Xi,Yi,Xf,Yf,Bo), display_all(Bo)
+																	)
+																);
+				write('That piece you selected is not a drone, you can not move it! ')
+				)
+				.
 
 update_drone(Xi,Yi,Xf,Yf,Bo):-
       board(Bi),
