@@ -114,18 +114,20 @@ inside_board(X,Index):-
 				; write('Coordenadas validas \n')
 				).
 
-check_drone_position(Xi,Yi,Xf,Yf):-
+check_drone_position(Xi,Yi,Xf,Yf,CanMove):-
 				convert(Yi,Indexi),
 				convert(Yf,Indexf),
+				Dx is abs(Xf - Xi),
+				Dy is abs(Indexf - Indexi),
 				inside_board(Xf,Indexf),
 				(
-				(Xf - Xi > 2 ; Indexf - Indexi > 2 ; Xi - Xf > 2 ; Indexi - Indexf > 2)
-				-> (write('Jogada invalida para drone \n'))
-				; write('Jogada valida para drone \n')
+				((Dx \= 0 , Dy \= 0) ; Dx > 2 ; Dy > 2)
+				-> (CanMove is 1)
+				; (CanMove is 0)
 				).
 
 
-check_pawn_position(Xi,Yi,Xf,Yf):-
+check_pawn_position(Xi,Yi,Xf,Yf,CanMove):-
 				convert(Yi,Indexi),
 				convert(Yf,Indexf),
 				inside_board(Xf,Indexf),
@@ -133,20 +135,20 @@ check_pawn_position(Xi,Yi,Xf,Yf):-
 				Dy is (Indexf - Indexi),
 				(
 				((Dx = -1 , Dy = -1) ; (Dx = -1 , Dy = 1) ; (Dx = 1 , Dy = 1) ; (Dx = 1 , Dy = -1))
-				-> write('Jogada valida para peao\n')
-				; write('Jogada invalida para peao\n')
+				-> (CanMove is 0)
+				; (CanMove is 1)
 				).
 
-check_queen_position(Xi,Yi,Xf,Yf):-
-				inside_board(Xf,Yf),
+check_queen_position(Xi,Yi,Xf,Yf,CanMove):-
 				convert(Yi,Indexi),
 				convert(Yf,Indexf),
+				inside_board(Xf,Indexf),
 				Dx is abs(Xf - Xi),
 				Dy is abs(Indexf - Indexi),
 				(
 				((Xi = Xf , Indexi \= Indexf) ; (Xi \= Xf , Indexi = Indexf) ; Dx = Dy)
-				->write('Jogada valida para rainha')
-				; write('Jogada invalida para rainha')
+				->(CanMove is 0)
+				; (CanMove is 1)
 				).
 
 check_owner(Letter,X):-
@@ -166,15 +168,141 @@ check_piece(Letter, Number,X):-
 move_pawn(Xi,Yi,Xf,Yf):-
 				coordenates(Yi,Xi,InitialPiece),
 				(
-				InitialPiece = pawn ->(check_pawn_position(Xi,Yi,Xf,Yf),check_piece(Yf,Xf,X),
+				InitialPiece = pawn ->(check_pawn_position(Xi,Yi,Xf,Yf,CanMove),
+				(
+				CanMove = 0 -> (
+				check_piece(Yf,Xf,X),
 				(
 				X = 1 -> write('path with pieces (1)');
 				X = 2 -> write('path with pieces (2)');
 				X = 3 -> (make_move(Xi,Yi,Xf,Yf,pawn,Bo), display_all(Bo))
 				)
 				);
+				CanMove = 1 -> write('Impossible movement for the pawn, it will not move! \n')
+				)
+				);
 				write('That piece you selected is not a pawn, you can not move it! ')
 				).
+
+move_drone(Xi,Yi,Xf,Yf):-
+				coordenates(Yi,Xi,InitialPiece),
+				(
+				InitialPiece = drone ->(check_drone_position(Xi,Yi,Xf,Yf,CanMove),
+				(
+				CanMove = 0 -> (
+				check_path_drone(Xi,Yi,Xf,Yf,P1,P2),
+				(
+				(P1 = 1 ; P2 = 1) -> write('path with pieces (1)');
+				(P1 = 2 ; P2 = 2) -> write('path with pieces (2)');
+				(P1 = 3 , P2 = 3 )-> make_move(Xi,Yi,Xf,Yf,drone,Bo), display_all(Bo)
+				)
+				);
+				CanMove = 1 -> write('Impossible movement for the drone, it will not move! \n')
+				)
+				);
+				write('That piece you selected is not a drone, you can not move it! ')
+				)
+				.
+
+move_queen(Xi,Yi,Xf,Yf):-
+				coordenates(Yi,Xi,InitialPiece),
+				(
+				InitialPiece = queen ->(check_queen_position(Xi,Yi,Xf,Yf),
+				(
+				CanMove = 0 ->(
+				check_path_queen(Xi,Yi,Xf,Yf,Move),
+				(
+				Move = 1 -> write('path with pieces (1)');
+				Move = 2 -> write('path with pieces (2)');
+				Move = 3 -> make_move(Xi,Yi,Xf,Yf,queen,Bo), display_all(Bo)
+				)
+				);
+				CanMove = 1 -> write('Impossible movement for the queen, it will not move! \n')
+				)
+				);
+				write('That piece you selected is not a queen, you can not move it! ')
+				)
+				.
+
+check_path_queen(Xi,Yi,Xf,Yf,Move):-
+				convert(Yi,Indexi),
+				convert(Yf,Indexf),
+				Dx is abs(Xf - Xi),
+				Dy is abs(Indexf - Indexi),
+				NewDy is Indexf - Indexi,
+				NewDx is Xf - Xi,
+				/**Verificar o movimento da rainha no eixo do x **/
+				(
+				((Dx \= 0 , Dy = 0 )-> ((
+										(Xf > Xi) -> (X is Xi+1);
+										(Xf < Xi) -> (X is Xi-1)
+										),
+										check_piece(Yi,X,Piece),
+										(
+										(Piece = 1 )-> Move is 1;
+										(Piece = 2) -> Move is 2;
+										(Piece = 3 )-> check_path_queen(X,Yi,Xf,Yf,Move)
+										)
+										)
+				);
+
+				((Dy \= 0 , Dx = 0 )-> (
+										(
+										(Indexf > Indexi) -> (Y is Indexi+1);
+										(Indexf < Indexi) -> (Y is Indexi-1)
+										),
+										convert_to_letter(Y,NewY),
+										check_piece(NewY,Xi,Piece),
+										(
+										(Piece = 1 )-> Move is 1;
+										(Piece = 2 ) -> Move is 2;
+										(Piece = 3 )-> check_path_queen(Xi,NewY,Xf,Yf,Move)
+										)
+										)
+				);
+				%diagonais
+				%direita
+				((NewDx > 0) -> (
+												(
+												((NewDy > 0) -> ( (X is Xi+1) ,(Y is Indexi + 1)));  %baixo
+												((NewDy < 0) -> ( (X is Xi+1) ,(Y is Indexi - 1)))	 %cima
+												),
+												convert_to_letter(Y,NewY),
+												check_piece(NewY,X,Piece),
+												(
+												(Piece = 1 )-> Move is 1;
+												(Piece = 2 ) -> Move is 2;
+												(Piece = 3 )-> check_path_queen(X,NewY,Xf,Yf,Move)
+												)
+												)
+
+				);
+				%esquerda
+				((NewDx < 0) -> (
+												(
+												((NewDy > 0) -> ( (X is Xi-1) ,(Y is Indexi + 1)));  %baixo
+												((NewDy < 0) -> ( (X is Xi-1) ,(Y is Indexi - 1)))	 %cima
+												),
+												convert_to_letter(Y,NewY),
+												check_piece(NewY,X,Piece),
+												(
+												(Piece = 1 )-> Move is 1;
+												(Piece = 2 ) -> Move is 2;
+												(Piece = 3 )-> check_path_queen(X,NewY,Xf,Yf,Move)
+												)
+												)
+
+				);
+
+
+				((NewDx = 0, NewDy = 0) -> Move is 3);
+				((Dx = 0 , Dy = 0) -> Move is 3
+				)
+				)
+
+				.
+
+
 
 make_move(Xi,Yi,Xf,Yf,Piece,Bo):-
 				board(Bi) ,
@@ -199,29 +327,8 @@ check_path_drone(Xi,Yi,Xf,Yf,Piece,Piece2):-
 				(Dy = 2, Indexf < Indexi)-> (check_piece(Yf,Xf,Piece), Y1 is (Indexf+1), convert_to_letter(Y1,L), check_piece(L,Xf,Piece2))
 				).
 
-move_drone(Xi,Yi,Xf,Yf):-
-				coordenates(Yi,Xi,InitialPiece),
-				(
-				InitialPiece = drone ->(check_drone_position(Xi,Yi,Xf,Yf), check_path_drone(Xi,Yi,Xf,Yf,P1,P2),
-				(
-				(P1 = 1 ; P2 = 1) -> write('path with pieces (1)');
-				(P1 = 2 ; P2 = 2) -> write('path with pieces (2)');
-				(P1 = 3 , P2 = 3 )-> make_move(Xi,Yi,Xf,Yf,drone,Bo), display_all(Bo)
-				)
-				);
-				write('That piece you selected is not a drone, you can not move it! ')
-				)
-				.
 
-/**update_drone(Xi,Yi,Xf,Yf,Bo):-
-      board(Bi),
-      convert(Yi,Numi),
-      convert(Yf,Numf),
-      Indexi is (Numi -1),
-      Indexf is (Numf - 1),
-      replace(Bi,Indexi,Xi,vazio,Bint),
-      replace(Bint,Indexf,Xf,drone,Bo)
-      .**/
+
 
 replace( L , X , Y , Z , R ) :-
 				append(RowPfx,[Row|RowSfx],L),
