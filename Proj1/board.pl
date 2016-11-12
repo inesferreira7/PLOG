@@ -139,8 +139,10 @@ is_inside(Val, ValMin, ValMax):-
 inside_board(Xi,Yi,Xf,Yf):-
 			is_inside(Xi,1,4),
 			is_inside(Xf,1,4),
-			is_inside(Yi,1,8),
-			is_inside(Yf,1,8).
+			convert(Yi,Indexi),
+			convert(Yf,Indexf),
+			is_inside(Indexi,1,8),
+			is_inside(Indexf,1,8).
 
 check_drone_position(Xi,Yi,Xf,Yf,CanMove):-
 				convert(Yi,Indexi),
@@ -407,7 +409,7 @@ verify_board_2(Board,Line,X) :-
 				).
 
 
-ask_coordenates:-
+ask_coordenates_1:-
 				write('Initial x:'), nl,
 				read(Xi),
 				write('Initial y:'), nl,
@@ -416,12 +418,28 @@ ask_coordenates:-
 				read(Xf),
 				write('Final y:'), nl,
 				read(Yf),
-				is_inside(Xf,1,4),
+				inside_board(Xi,Yi,Xf,Yf),
 				play_1(Xi,Yi,Xf,Yf).
 
-ask_coordenates:-
-	write('invalid coordenates, please insert new ones'), nl,
-	ask_coordenates.
+ask_coordenates_1:-
+	write('Invalid coordenates, please insert new ones'), nl,
+	ask_coordenates_1.
+
+ask_coordenates_2:-
+				write('Initial x:'), nl,
+				read(Xi),
+				write('Initial y:'), nl,
+				read(Yi),
+				write('Final x:'), nl,
+				read(Xf),
+				write('Final y:'), nl,
+				read(Yf),
+				inside_board(Xi,Yi,Xf,Yf),
+				play_2(Xi,Yi,Xf,Yf).
+
+	ask_coordenates_2:-
+		write('Invalid coordenates, please insert new ones'), nl,
+		ask_coordenates_2.
 
 endGame(Board,X):-
 			verify_board_1(Board,1,X),
@@ -429,6 +447,15 @@ endGame(Board,X):-
 			verify_board_2(Board,5,Y),
 			(Y = 1 -> write('Player 1 win!!')).
 
+isPar(N):- N mod 2 =:= 0.
+
+play_game(N):-
+		N1 is N+1,
+		(
+		isPar(N1) -> ask_coordenates_1;
+		ask_coordenates_2
+		),
+		play_game(N1).
 
 replace( L , X , Y , Z , R ) :-
 				append(RowPfx,[Row|RowSfx],L),
