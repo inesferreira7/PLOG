@@ -11,6 +11,27 @@ board([
       [h,vazio,drone,queen,queen]
 			]).
 
+board1vazio([
+			[a,vazio,vazio,vazio,vazio],
+			[b,vazio,vazio,vazio,vazio],
+			[c,vazio,vazio,vazio,vazio],
+			[d,vazio,vazio,vazio,vazio],
+			[e,vazio,vazio,vazio,vazio],
+			[f,vazio,pawn,pawn,drone],
+			[g,vazio,pawn,drone,queen],
+			[h,vazio,drone,queen,queen]
+			]).
+
+board2vazio([
+			[a,queen,queen,drone,vazio],
+			[b,queen,drone,pawn,vazio],
+			[c,drone,pawn,pawn,vazio],
+			[d,vazio,vazio,vazio,vazio],
+			[e,vazio,vazio,vazio,vazio],
+			[f,vazio,pawn,pawn,drone],
+			[g,vazio,pawn,drone,queen],
+			[h,vazio,drone,queen,queen]
+			]).
 
 numbers([
 			[vazio,um,dois,tres,quatro]
@@ -73,6 +94,8 @@ find_head(Elem, [Line|Rest],X):- head(Elem,Line,X); find_head(Elem,Rest,X).
 
 line_board(Elem,X):-board(B), find_head(Elem,B,X).
 
+removehead([_|Tail], Tail).
+
 
 coordenates(Letter,Number,Piece):-
 				line_board(Letter,X),
@@ -110,7 +133,7 @@ convert_to_letter(Index,Letter):-
 inside_board(X,Index):-
 				(
 				(X<1 ; X>4; Index>8; Index<1)
-				-> write('Coordenadas invalidas \n')
+				-> (write('Invalid coordenates, insert new ones: \n'),ask_coordenates)
 				; write('Coordenadas validas \n')
 				).
 
@@ -329,28 +352,72 @@ check_path_drone(Xi,Yi,Xf,Yf,Piece,Piece2):-
 
 
 play_1(Xi,Yi,Xf,Yf):-
-			coordenates(Yi,Xi,Piece),
-			convert(Yi,Num),
-			(
-			Num > 4 -> write('Not your piece');
-			(
-			Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf);
-			Piece = drone -> move_drone(Xi,Yi,Xf,Yf);
-			Piece = queen -> move_drone(Xi,Yi,Xf,Yf);
-			Piece = vazio -> write('Nothing to move on those coordenates')
-			)).
+				coordenates(Yi,Xi,Piece),
+				convert(Yi,Num),
+				(
+				Num > 4 -> write('Not your piece');
+				(
+				Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf);
+				Piece = drone -> move_drone(Xi,Yi,Xf,Yf);
+				Piece = queen -> move_drone(Xi,Yi,Xf,Yf);
+				Piece = vazio -> write('Nothing to move on those coordenates')
+				)).
 
 play_2(Xi,Yi,Xf,Yf):-
-			coordenates(Yi,Xi,Piece),
-			convert(Yi,Num),
-			(
-			Num =< 4 -> write('Not your piece');
-			(
-			Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf);
-			Piece = drone -> move_drone(Xi,Yi,Xf,Yf);
-			Piece = queen -> move_drone(Xi,Yi,Xf,Yf);
-			Piece = vazio -> write('Nothing to move on those coordenates')
-			)).
+				coordenates(Yi,Xi,Piece),
+				convert(Yi,Num),
+				(
+				Num =< 4 -> write('Not your piece');
+				(
+				Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf);
+				Piece = drone -> move_drone(Xi,Yi,Xf,Yf);
+				Piece = queen -> move_drone(Xi,Yi,Xf,Yf);
+				Piece = vazio -> write('Nothing to move on those coordenates')
+				)).
+
+verify_board_1(Board,Line,X) :-
+				(
+				Line = 5 -> X=1 %se x=1 quer dizer que está vazio
+				);
+				nth1(Line,Board,Elem),
+				removehead(Elem,Elem1),
+				(
+				Elem1 \= [vazio,vazio,vazio,vazio] -> X = 0
+				;
+				Line1 is (Line + 1),
+				verify_board_1(Board,Line1,X)
+				).
+
+verify_board_2(Board,Line,X) :-
+				(
+				Line = 9 -> X=1 %se x=1 quer dizer que está vazio
+				);
+				nth1(Line,Board,Elem),
+				removehead(Elem,Elem1),
+				(
+				Elem1 \= [vazio,vazio,vazio,vazio] -> X = 0
+				;
+				Line1 is (Line + 1),
+				verify_board_1(Board,Line1,X)
+				).
+
+ask_coordenates:-
+				write('Initial x:'), nl,
+				read(Xi),
+				write('Initial y:'), nl,
+				read(Yi),
+				write('Final x:'), nl,
+				read(Xf),
+				write('Final y:'), nl,
+				read(Yf),
+				play_1(Xi,Yi,Xf,Yf).
+
+endGame(Board,X):-
+			verify_board_1(Board,1,X),
+			(X = 1 -> write('Player 2 win!!')),
+			verify_board_2(Board,5,Y),
+			(Y = 1 -> write('Player 1 win!!')).
+
 
 replace( L , X , Y , Z , R ) :-
 				append(RowPfx,[Row|RowSfx],L),
