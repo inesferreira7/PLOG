@@ -1,4 +1,5 @@
 :- use_module(library(lists)).
+:-include('cli.pl').
 
 board([
 			[a,queen,queen,drone,vazio],
@@ -364,7 +365,7 @@ play_1(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
 				Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput);
 				Piece = drone -> move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput);
 				Piece = queen -> move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput);
-				Piece = vazio -> write('Nothing to move on those coordenates')
+				Piece = vazio -> (write('Nothing to move on those coordenates. Insert new ones\n'),ask_coordenates_1(BoardReceived,BoardOutput))
 				)).
 
 play_2(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
@@ -376,7 +377,7 @@ play_2(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
 				Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput);
 				Piece = drone -> move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput);
 				Piece = queen -> move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput);
-				Piece = vazio -> write('Nothing to move on those coordenates')
+				Piece = vazio -> (write('Nothing to move on those coordenates. Insert new ones\n'), ask_coordenates_2(BoardReceived,BoardOutput))
 				)).
 
 verify_board_1(Board,Line,X) :-
@@ -454,8 +455,8 @@ start_game(N):-
 make_play(N,Board):-
 		N1 is N+1,
 		(
-		isPar(N1) -> ask_coordenates_1(Board,BoardOutput);
-		ask_coordenates_2(Board,BoardOutput)
+		isPar(N1) -> (print_turn1,ask_coordenates_1(Board,BoardOutput));
+		(print_turn2,ask_coordenates_2(Board,BoardOutput))
 		),
 		make_play(N1,BoardOutput).
 
