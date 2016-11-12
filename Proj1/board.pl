@@ -196,7 +196,7 @@ check_piece(Letter, Number,X,BoardReceived):-
 				; check_owner(Letter,X)
 				).
 
-move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
+move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P):-
 				coordenates(Yi,Xi,InitialPiece,BoardReceived),
 				(
 				InitialPiece = pawn ->(check_pawn_position(Xi,Yi,Xf,Yf,CanMove),
@@ -209,13 +209,17 @@ move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
 				X = 3 -> (make_move(Xi,Yi,Xf,Yf,pawn,BoardReceived,BoardOutput), display_all(BoardOutput))
 				)
 				);
-				CanMove = 1 -> write('Impossible movement for the pawn, it will not move! \n')
+				CanMove = 1 -> write('Impossible movement for the pawn, it will not move! Insert new coordenates\n'),
+				(
+				P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput);
+				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput)
+				)
 				)
 				);
 				write('That piece you selected is not a pawn, you can not move it! ')
 				).
 
-move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
+move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P):-
 				coordenates(Yi,Xi,InitialPiece,BoardReceived),
 				(
 				InitialPiece = drone ->(check_drone_position(Xi,Yi,Xf,Yf,CanMove),
@@ -228,17 +232,21 @@ move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
 				(P1 = 3 , P2 = 3 )-> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), display_all(BoardOutput)
 				)
 				);
-				CanMove = 1 -> write('Impossible movement for the drone, it will not move! \n')
+				CanMove = 1 -> write('Impossible movement for the drone, it will not move! Insert new coordenates. \n'),
+				(
+				P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput);
+				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput)
+				)
 				)
 				);
 				write('That piece you selected is not a drone, you can not move it! ')
 				)
 				.
 
-move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
+move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P):-
 				coordenates(Yi,Xi,InitialPiece,BoardReceived),
 				(
-				InitialPiece = queen ->(check_queen_position(Xi,Yi,Xf,Yf),
+				InitialPiece = queen ->(check_queen_position(Xi,Yi,Xf,Yf,CanMove),
 				(
 				CanMove = 0 ->(
 				check_path_queen(Xi,Yi,Xf,Yf,Move),
@@ -248,7 +256,11 @@ move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
 				Move = 3 -> make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput), display_all(BoardOutput)
 				)
 				);
-				CanMove = 1 -> write('Impossible movement for the queen, it will not move! \n')
+				CanMove = 1 -> write('Impossible movement for the queen, it will not move! Insert new coordenates.\n'),
+				(
+				P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput);
+				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput)
+				)
 				)
 				);
 				write('That piece you selected is not a queen, you can not move it! ')
@@ -362,9 +374,9 @@ play_1(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
 				(
 				Num > 4 -> write('Not your piece');
 				(
-				Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput);
-				Piece = drone -> move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput);
-				Piece = queen -> move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput);
+				Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,1);
+				Piece = drone -> move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,1);
+				Piece = queen -> move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,1);
 				Piece = vazio -> (write('Nothing to move on those coordenates. Insert new ones\n'),ask_coordenates_1(BoardReceived,BoardOutput))
 				)).
 
@@ -374,9 +386,9 @@ play_2(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
 				(
 				Num =< 4 -> write('Not your piece');
 				(
-				Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput);
-				Piece = drone -> move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput);
-				Piece = queen -> move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput);
+				Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,2);
+				Piece = drone -> move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,2);
+				Piece = queen -> move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,2);
 				Piece = vazio -> (write('Nothing to move on those coordenates. Insert new ones\n'), ask_coordenates_2(BoardReceived,BoardOutput))
 				)).
 
