@@ -130,19 +130,24 @@ convert_to_letter(Index,Letter):-
 			; write('Numero invalido')
 			).
 
-inside_board(X,Index):-
-				(
-				(X<1 ; X>4; Index>8; Index<1)
-				-> (write('Invalid coordenates, insert new ones: \n'),ask_coordenates)
-				; write('Coordenadas validas \n')
-				).
+
+is_inside(Val, ValMin, ValMax):-
+			Val >= ValMin,
+			Val =< ValMax.
+
+
+inside_board(Xi,Yi,Xf,Yf):-
+			is_inside(Xi,1,4),
+			is_inside(Xf,1,4),
+			is_inside(Yi,1,8),
+			is_inside(Yf,1,8).
 
 check_drone_position(Xi,Yi,Xf,Yf,CanMove):-
 				convert(Yi,Indexi),
 				convert(Yf,Indexf),
 				Dx is abs(Xf - Xi),
 				Dy is abs(Indexf - Indexi),
-				inside_board(Xf,Indexf),
+				%inside_board(Xf,Indexf),
 				(
 				((Dx \= 0 , Dy \= 0) ; Dx > 2 ; Dy > 2)
 				-> (CanMove is 1)
@@ -153,7 +158,7 @@ check_drone_position(Xi,Yi,Xf,Yf,CanMove):-
 check_pawn_position(Xi,Yi,Xf,Yf,CanMove):-
 				convert(Yi,Indexi),
 				convert(Yf,Indexf),
-				inside_board(Xf,Indexf),
+				%inside_board(Xf,Indexf),
 				Dx is (Xf - Xi),
 				Dy is (Indexf - Indexi),
 				(
@@ -165,7 +170,7 @@ check_pawn_position(Xi,Yi,Xf,Yf,CanMove):-
 check_queen_position(Xi,Yi,Xf,Yf,CanMove):-
 				convert(Yi,Indexi),
 				convert(Yf,Indexf),
-				inside_board(Xf,Indexf),
+				%inside_board(Xf,Indexf),
 				Dx is abs(Xf - Xi),
 				Dy is abs(Indexf - Indexi),
 				(
@@ -401,6 +406,7 @@ verify_board_2(Board,Line,X) :-
 				verify_board_1(Board,Line1,X)
 				).
 
+
 ask_coordenates:-
 				write('Initial x:'), nl,
 				read(Xi),
@@ -410,7 +416,12 @@ ask_coordenates:-
 				read(Xf),
 				write('Final y:'), nl,
 				read(Yf),
+				is_inside(Xf,1,4),
 				play_1(Xi,Yi,Xf,Yf).
+
+ask_coordenates:-
+	write('invalid coordenates, please insert new ones'), nl,
+	ask_coordenates.
 
 endGame(Board,X):-
 			verify_board_1(Board,1,X),
