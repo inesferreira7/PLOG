@@ -328,14 +328,29 @@ check_path_drone(Xi,Yi,Xf,Yf,Piece,Piece2):-
 				).
 
 
-jogada(Xi,Yi,Xf,Yf):-
+play_1(Xi,Yi,Xf,Yf):-
 			coordenates(Yi,Xi,Piece),
+			convert(Yi,Num),
+			(
+			Num > 4 -> write('Not your piece');
 			(
 			Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf);
 			Piece = drone -> move_drone(Xi,Yi,Xf,Yf);
 			Piece = queen -> move_drone(Xi,Yi,Xf,Yf);
 			Piece = vazio -> write('Nothing to move on those coordenates')
-			).
+			)).
+
+play_2(Xi,Yi,Xf,Yf):-
+			coordenates(Yi,Xi,Piece),
+			convert(Yi,Num),
+			(
+			Num =< 4 -> write('Not your piece');
+			(
+			Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf);
+			Piece = drone -> move_drone(Xi,Yi,Xf,Yf);
+			Piece = queen -> move_drone(Xi,Yi,Xf,Yf);
+			Piece = vazio -> write('Nothing to move on those coordenates')
+			)).
 
 replace( L , X , Y , Z , R ) :-
 				append(RowPfx,[Row|RowSfx],L),
