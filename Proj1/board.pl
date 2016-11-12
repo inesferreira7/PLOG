@@ -220,7 +220,7 @@ move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
 				InitialPiece = drone ->(check_drone_position(Xi,Yi,Xf,Yf,CanMove),
 				(
 				CanMove = 0 -> (
-				check_path_drone(Xi,Yi,Xf,Yf,P1,P2,BoardReceived,BoardOutput),
+				check_path_drone(Xi,Yi,Xf,Yf,P1,P2,BoardReceived),
 				(
 				(P1 = 1 ; P2 = 1 ) -> write('path with pieces (1)');
 				(P1 = 2 ; P2 = 2 ) -> write('path with pieces (2)');
