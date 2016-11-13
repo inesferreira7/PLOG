@@ -51,21 +51,7 @@ instructionsMenu:-
         clearScreen,
         printInstructions.
 
-%%%%%%%%%%%% Print of main menu %%%%%%%%%%%%
-
-printMainMenu:-
-        write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n'),
-        write('%%         Martian Chess         %%\n'),
-        write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n'),
-        write('%%                               %%\n'),
-        write('%%      1 - Player vs Player     %%\n'),
-        write('%%         2 - Instrucoes        %%\n'),
-        write('%%           3 - Exit            %%\n'),
-        write('%%                               %%\n'),
-        write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n').
-
-
-%%%%%%%%%%%%% Print instructions %%%%%%%%%%%%%
+        %%%%%%%%%%%%% Print instructions %%%%%%%%%%%%%
 
 printInstructions:-
         write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n'),
@@ -86,6 +72,19 @@ printInstructions:-
         write('%%   Pawns - 1 point                                    %%\n'),
         write('%%                                                      %%\n'),
         write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n').
+
+%%%%%%%%%%%% Print of main menu %%%%%%%%%%%%
+
+printMainMenu:-
+        write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n'),
+        write('%%         Martian Chess         %%\n'),
+        write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n'),
+        write('%%                               %%\n'),
+        write('%%      1 - Player vs Player     %%\n'),
+        write('%%         2 - Instrucoes        %%\n'),
+        write('%%           3 - Exit            %%\n'),
+        write('%%                               %%\n'),
+        write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n').
 
 
 %%%%%%%%%%%% Print of player 1 turn %%%%%%%%%%%%

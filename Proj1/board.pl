@@ -562,13 +562,18 @@ start_game(N,S1,S2):-
 	display_scores(S1,S2),
 	make_play(N,Board,S1,S2).
 
+compare(S1,S2):-
+			(
+			S1 < S2 -> print_winner2;
+			S1 > S2 -> print_winner1
+			).
+
 
 	make_play(N,Board,S1,S2):-
 			endGame(Board,X),
 			(
 			(
-			X = 1 -> print_winner1;
-			X = 2 -> print_winner2
+			(X = 1 ; X = 2) ->compare(S1,S2)
 			);
 			(
 			N1 is N+1,
