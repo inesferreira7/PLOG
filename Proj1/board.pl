@@ -5,8 +5,8 @@ board([
 			[a,queen,queen,drone,vazio],
 			[b,queen,drone,pawn,vazio],
 			[c,drone,pawn,pawn,vazio],
-			[d,vazio,vazio,vazio,vazio],
-      [e,vazio,vazio,vazio,vazio],
+			[d,drone,vazio,vazio,vazio],
+      [e,drone,vazio,vazio,vazio],
       [f,vazio,pawn,pawn,drone],
       [g,vazio,pawn,drone,queen],
       [h,vazio,drone,queen,queen]
@@ -246,15 +246,15 @@ move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P,S1,S1f,S2,S2f):-
 				InitialPiece = drone ->(check_drone_position(Xi,Yi,Xf,Yf,CanMove),
 				(
 				CanMove = 0 -> (
-				check_path_drone(Xi,Yi,Xf,Yf,P1,P2,BoardReceived),(NewY is abs(Indexf - 1)),
+				check_path_drone(Xi,Yi,Xf,Yf,P1,P2,BoardReceived),(NewY is abs(Indexf - 1)),(NewY2 is abs(Indexi-1)),
 				(
 				(P = 1 , P1 = 1 ) -> write('The path has pieces of player 1! Insert new coordenates. \n'), ask_coordenates_1(BoardReceived,BoardOutput);
 				(P = 1 , P1 = 2 , NewY = Indexi ) -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score1(S1,FinalPiece,S1f,S2,S2f),display_all(BoardOutput);
 				(P = 1 , P1 = 2 , NewY > Indexi ) -> write('The path has pieces of player 2! Insert new coordenates. \n'), ask_coordenates_1(BoardReceived,BoardOutput);
 
 				(P = 2 , P1 = 2) -> write('The path has pieces of player 2! Insert new coordenates. \n'), ask_coordenates_2(BoardReceived,BoardOutput);
-				(P = 2 , P1 = 1 , NewY = Indexi ) -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score2(S2,FinalPiece,S2f,S1,S1f),display_all(BoardOutput);
-				(P = 2 , P1 = 1 , NewY > Indexi ) -> write('The path has pieces of player 1! Insert new coordenates. \n'), ask_coordenates_2(BoardReceived,BoardOutput);
+				(P = 2 , P1 = 1 , NewY2 = Indexf ) -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score2(S2,FinalPiece,S2f,S1,S1f),display_all(BoardOutput);
+				(P = 2 , P1 = 1 , NewY2 > Indexf ) -> write('The path has pieces of player 1! Insert new coordenates. \n'), ask_coordenates_2(BoardReceived,BoardOutput);
 
 				(P1 = 3 , P2 = 3 )-> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput)
 				)
