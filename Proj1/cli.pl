@@ -1,9 +1,9 @@
 %%%%%%%%%%%%%% Clears screen screen %%%%%%%%%%%%%%%%%
-clearScreen :-
+clearScreen:-
         printBlank(65).
 
 %%%%%%%%%%%%%% Blank %%%%%%%%%%%%%%%%
-printBlank(X) :-
+printBlank(X):-
         X > 0,
         nl,
         X1 is X-1,
@@ -13,12 +13,12 @@ printBlank(_).
 
 %%%%%%%%%%%% Interface - menu %%%%%%%%%%%%%%%
 
-mainMenu :-
+mainMenu:-
         clearScreen,
         printMainMenu,
         get_char(In),
         (
-          In = '1' -> write('Play game\n'), playMenu;
+          In = '1' -> write('Player vs Player\n'), playMenu;
           In = '2' -> write('Instructions\n'), instructionsMenu;
           In = '3' -> write('Exit\n');
 
@@ -26,11 +26,24 @@ mainMenu :-
 
         ).
 
+%%%%%%%%%%% Choose Player %%%%%%%%%%%%%%
+
+choose_player(X):-
+        get_char(In),
+        (
+        (In = '1' -> X = 1;
+        In = '2' -> X = 0
+        );
+        choose_player(X))
+        .
+
 %%%%%%%%%%% Play menu %%%%%%%%%%%%%%
 
 playMenu:-
                 clearScreen,
-                play_game(_X,_Y,_Z,_S).
+                write('Who is the player whose hair is closest to red? '),
+                choose_player(X),
+                start_game(X,0,0).
 
 %%%%%%%%%%% Instructions menu %%%%%%%%%%%%%%
 
@@ -45,7 +58,7 @@ printMainMenu:-
         write('%%         Martian Chess         %%\n'),
         write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n'),
         write('%%                               %%\n'),
-        write('%%           1 - Play            %%\n'),
+        write('%%      1 - Player vs Player     %%\n'),
         write('%%         2 - Instrucoes        %%\n'),
         write('%%           3 - Exit            %%\n'),
         write('%%                               %%\n'),

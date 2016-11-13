@@ -14,13 +14,13 @@ board([
 
 		board1vazio([
 			[a,vazio,vazio,vazio,vazio],
-			[b,vazio,drone,vazio,vazio],
-			[c,vazio,vazio,vazio,vazio],
-			[d,drone,vazio,queen,vazio],
-			[e,drone,pawn,queen,vazio],
+			[b,vazio,vazio,vazio,vazio],
+			[c,pawn,vazio,vazio,vazio],
+			[d,vazio,pawn,vazio,vazio],
+			[e,drone,pawn,vazio,vazio],
 			[f,vazio,pawn,pawn,drone],
-			[g,vazio,pawn,drone,queen],
-			[h,vazio,drone,queen,queen]
+			[g,vazio,pawn,vazio,drone],
+			[h,vazio,vazio,drone,vazio]
 			]).
 
 numbers([
@@ -102,7 +102,7 @@ convert(Letter,Index):-
 			Letter = f -> Index = 6;
 			Letter = g -> Index = 7;
 			Letter = h -> Index = 8);
-      write('Letra invalida')
+      write('Invalid letter! \n')
 			).
 
 convert_to_letter(Index,Letter):-
@@ -116,7 +116,7 @@ convert_to_letter(Index,Letter):-
 			Index = 6 -> Letter = f;
 			Index = 7 -> Letter = g;
 			Index = 8 -> Letter = h)
-			; write('Numero invalido')
+			; write('Invalid number! \n')
 			).
 
 
@@ -180,27 +180,40 @@ check_owner(Letter,X):-
 check_piece(Letter, Number,X,BoardReceived):-
 				coordenates(Letter,Number,Piece,BoardReceived),
 				(
+
 				(Piece = vazio) -> X is 3
 				; check_owner(Letter,X)
+				).
+
+can_transform(Letter,Number,BoardReceived,PieceFinal):-
+				coordenates(Letter,Number,Piece,BoardReceived),
+				(
+				Piece = pawn -> PieceFinal is 1;
+				Piece = drone -> PieceFinal is 2;
+				PieceFinal is 0
 				).
 
 move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P,S1,S1f,S2,S2f):-
 				coordenates(Yi,Xi,InitialPiece,BoardReceived),
 				coordenates(Yf,Xf,FinalPiece,BoardReceived),
 				(
-				InitialPiece = pawn ->(check_pawn_position(Xi,Yi,Xf,Yf,CanMove),
+				InitialPiece = pawn ->(check_pawn_position(Xi,Yi,Xf,Yf,CanMove), 	/*can_transform(Yf,Xf,BoardReceived,Transform),**/
 				(
 				CanMove = 0 -> (
 				check_piece(Yf,Xf,X,BoardReceived),
 				(
-				X = 1 ->(write('The path has pieces of player 1! Insert new coordenates. \n'),
+				X = 1 ->(write('You can not jump over pieces! Insert new coordenates: \n'),
 				(
+				(P = 1 , FinalPiece = drone, \+exists_on_board_half(BoardReceived,0,queen)) -> (make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput),update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput));
+				(P = 1 , FinalPiece = pawn, \+exists_on_board_half(BoardReceived,0,drone)) -> (make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput),update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput));
 				P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput, S1,S1f,S2,S2f);
 				P = 2 -> (make_move(Xi,Yi,Xf,Yf,pawn,BoardReceived,BoardOutput), update_score2(S2,FinalPiece,S2f,S1,S1f), display_all(BoardOutput))
 				)
 				);
-				X = 2 -> (write('The path has pieces of player 2! Insert new coordenates. \n'),
+				X = 2 -> (write('You can not jump over pieces! Insert new coordenates: \n'),
 				(
+				(P = 2 , FinalPiece = drone , \+exists_on_board_half(BoardReceived,1,queen))-> (make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput),update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput));
+				(P = 2 , FinalPiece = pawn , \+exists_on_board_half(BoardReceived,1,drone))-> (make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput),update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput));
 				P = 1 -> (make_move(Xi,Yi,Xf,Yf,pawn,BoardReceived,BoardOutput), update_score1(S1,FinalPiece,S1f,S2,S2f),display_all(BoardOutput));
 				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f)
 				)
@@ -208,14 +221,14 @@ move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P,S1,S1f,S2,S2f):-
 				X = 3 -> (make_move(Xi,Yi,Xf,Yf,pawn,BoardReceived,BoardOutput), update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput))
 				)
 				);
-				CanMove = 1 -> write('Impossible movement for the pawn, it will not move! Insert new coordenates\n'),
+				CanMove = 1 -> write('Impossible movement for the pawn, it will not move! Insert new coordenates: \n'),
 				(
 				P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
 				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f)
 				)
 				)
 				);
-				write('That piece you selected is not a pawn, you can not move it! ')
+				write('The piece you selected is not a pawn, you can not move it! ')
 				).
 
 update_score1(S1,Piece,S1f,S2,S2f):-
@@ -244,31 +257,49 @@ move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P,S1,S1f,S2,S2f):-
 				convert(Yi, Indexi),
 				convert(Yf, Indexf),
 				(
-				InitialPiece = drone ->(check_drone_position(Xi,Yi,Xf,Yf,CanMove),
+				InitialPiece = drone ->(check_drone_position(Xi,Yi,Xf,Yf,CanMove),/**can_transform(Yf,Xf,BoardReceived,Transform),**/
 				(
 				CanMove = 0 -> (
-				check_path_drone(Xi,Yi,Xf,Yf,P1,P2,BoardReceived),(NewY is abs(Indexf - 1)),(NewY2 is abs(Indexi-1)),
-				(
-				(P = 1 , P1 = 1 ) -> write('The path has pieces of player 1! Insert new coordenates. \n'), ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
-				(P = 1 , P1 = 2 , NewY = Indexi ) -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score1(S1,FinalPiece,S1f,S2,S2f),display_all(BoardOutput);
-				(P = 1 , P1 = 2 , NewY > Indexi ) -> write('The path has pieces of player 2! Insert new coordenates. \n'), ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
+				check_path_drone(Xi,Yi,Xf,Yf,P1,P2,BoardReceived),(NewY is abs(Indexf - 1)),(NewY2 is abs(Indexi-1)),(NewX is abs(Xf -1)), (NewX2 is abs(Xi - 1)),
 
-				(P = 2 , P1 = 2) -> write('The path has pieces of player 2! Insert new coordenates. \n'), ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
+				(
+				%para baixo
+				%trace,
+				(P = 1 , P1 = 1, NewY = Indexi , FinalPiece = pawn, \+exists_on_board_half(BoardReceived,0,queen)) ->  (make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput),update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput));
+				(P = 1 , P1 = 1 ) -> write('(1)You can not jump over pieces! Insert new coordenates: \n'), ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
+				(P = 1 , P1 = 2 , NewY = Indexi ) -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score1(S1,FinalPiece,S1f,S2,S2f),display_all(BoardOutput);
+				(P = 1 , P1 = 2 , NewY > Indexi ) -> write('(2)You can not jump over pieces! Insert new coordenates: \n'), ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
+				(P = 1 , P1 = 3 , P2 = 2) -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score1(S1,FinalPiece,S1f,S2,S2f),display_all(BoardOutput);
+
+				%lados
+				(P = 1 , P1 = 1, NewX = Xi , FinalPiece = pawn, \+exists_on_board_half(BoardReceived,0,queen)) ->  (make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput),update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput));
+				(P = 1 , P1 = 1, NewX2 = Xf , FinalPiece = pawn, \+exists_on_board_half(BoardReceived,0,queen)) ->  (make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput),update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput));
+
+				(P = 2 , P1 = 2, NewX = Xi , FinalPiece = pawn, \+exists_on_board_half(BoardReceived,1,queen)) ->  (make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput),update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput));
+				(P = 2 , P1 = 2, NewX2 = Xf , FinalPiece = pawn, \+exists_on_board_half(BoardReceived,1,queen)) ->  (make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput),update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput));
+
+				(P = 1 , P1 = 3 , P2 = 1 , FinalPiece = pawn , \+exists_on_board_half(BoardReceived,0,queen)) -> (make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput),update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput));
+				(P = 2 , P1 = 3 , P2 = 2 , FinalPiece = pawn , \+exists_on_board_half(BoardReceived,1,queen)) -> (make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput),update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput));
+
+				%para cima
+				(P = 2 , P1 = 2, NewY2 = Indexf , FinalPiece = pawn, \+exists_on_board_half(BoardReceived,1,queen)) ->  (make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput),update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput));
+				(P = 2 , P1 = 2) -> write('(3)You can not jump over pieces! Insert new coordenates: \n'), ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
 				(P = 2 , P1 = 1 , NewY2 = Indexf ) -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score2(S2,FinalPiece,S2f,S1,S1f),display_all(BoardOutput);
-				(P = 2 , P1 = 1 , NewY2 > Indexf ) -> write('The path has pieces of player 1! Insert new coordenates. \n'), ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
+				(P = 2 , P1 = 1 , NewY2 > Indexf ) -> write('You can not jump over pieces! Insert new coordenates: \n'), ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
+				(P = 2 , P1 = 3 , P2 = 1)-> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score2(S2,FinalPiece,S2f,S1,S1f),display_all(BoardOutput);
 
 				(P1 = 3 , P2 = 3 )-> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput)
 				)
 
 				);
-				CanMove = 1 -> write('Impossible movement for the drone, it will not move! Insert new coordenates. \n'),
+				CanMove = 1 -> write('Impossible movement for the drone, it will not move! Insert new coordenates: \n'),
 				(
 				P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
 				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f)
 				)
 				)
 				);
-				write('That piece you selected is not a drone, you can not move it! ')
+				write('The piece you selected is not a drone, you can not move it! ')
 				)
 				.
 
@@ -282,13 +313,13 @@ move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P,S1,S1f,S2,S2f):-
 
 				check_path_queen(Xi,Yi,Xf,Yf,Move,BoardReceived),
 				(
-				Move = 1 -> (write('The path has pieces of player 1! Insert new coordenates. \n'),
+				Move = 1 -> (write('You can not jump over pieces! Insert new coordenates: \n'),
 				(
 				P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
 				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f)
 				)
 				);
-				Move = 2 ->(write('The path has pieces of player 2! Insert new coordenates. \n'),
+				Move = 2 ->(write('You can not jump over pieces! Insert new coordenates: \n'),
 				(
 				P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
 				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f)
@@ -297,20 +328,20 @@ move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P,S1,S1f,S2,S2f):-
 				)
 				);
 				Move = 3 -> make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput), update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput);
-				(Move  = 4 , P = 1) ->(write('The path has pieces of player 1! Insert new coordenates. \n'), ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f));
-				(Move  = 5 , P = 2) -> (write('The path has pieces of player 2! Insert new coordenates. \n'),ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f));
+				(Move  = 4 , P = 1) ->(write('You can not jump over pieces! Insert new coordenates: \n'), ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f));
+				(Move  = 5 , P = 2) -> (write('You can not jump over pieces! Insert new coordenates: \n'),ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f));
 				(Move  = 4 ,  P = 2  ) -> make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput), update_score2(S2,FinalPiece,S2f,S1,S1f),display_all(BoardOutput);
 				(Move  = 5 ,  P = 1  ) -> make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput), update_score1(S1,FinalPiece,S1f,S2,S2f),display_all(BoardOutput)
 				)
 				);
-				CanMove = 1 -> write('Impossible movement for the queen, it will not move! Insert new coordenates.\n'),
+				CanMove = 1 -> write('Impossible movement for the queen, it will not move! Insert new coordenates:\n'),
 				(
 				P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f);
 				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f)
 				)
 				)
 				);
-				write('That piece you selected is not a queen, you can not move it! ')
+				write('The piece you selected is not a queen, you can not move it! ')
 				)
 				.
 
@@ -363,7 +394,7 @@ check_path_queen(Xi,Yi,Xf,Yf,Move,BoardReceived):-
 												((NewDy < 0) -> ( (X is Xi+1) ,(Y is Indexi - 1)))	 %cima
 												),
 												convert_to_letter(Y,NewY),
-												check_piece(NewY,X,Piece,BoardReceived),(Dnew is NewDx -1),
+												check_piece(NewY,X,Piece,BoardReceived),(Dnew is (abs(NewDx) -1)),
 												(
 												(Dnew = 0 , Piece = 1 ) -> Move is 4; % ultima peça do player 1
 												(Dnew = 0 , Piece = 2 ) -> Move is 5; % ultima peça do player 2
@@ -381,7 +412,7 @@ check_path_queen(Xi,Yi,Xf,Yf,Move,BoardReceived):-
 												((NewDy < 0) -> ( (X is Xi-1) ,(Y is Indexi - 1)))	 %cima
 												),
 												convert_to_letter(Y,NewY),
-												check_piece(NewY,X,Piece,BoardReceived),(Dnew is NewDy -1),
+												check_piece(NewY,X,Piece,BoardReceived),(Dnew is (abs(NewDy) -1)),
 												(
 												(Dnew = 0 , Piece = 1 ) -> Move is 4; % ultima peça do player 1
 												(Dnew = 0 , Piece = 2 ) -> Move is 5; % ultima peça do player 2
@@ -415,12 +446,12 @@ check_path_drone(Xi,Yi,Xf,Yf,Piece, Piece2,BoardReceived):-
 					Dx is abs(Xf-Xi),
 					Dy is abs(Indexf-Indexi),
 					(
-					Dx = 1  -> (Piece2 is 3 ,  check_piece(Yf,Xf,Piece,BoardReceived));
-					Dy = 1 -> (Piece2 is 3 , check_piece(Yf,Xf,Piece,BoardReceived));
-					(Dx = 2, Xf > Xi)-> (check_piece(Yf,Xf,Piece2,BoardReceived), X1 is (Xf-1), check_piece(Yf,X1,Piece,BoardReceived));
-					(Dx = 2, Xf < Xi)-> (check_piece(Yf,Xf,Piece2,BoardReceived), X1 is (Xf+1), check_piece(Yf,X1,Piece,BoardReceived));
-					(Dy = 2, Indexf > Indexi)-> (check_piece(Yf,Xf,Piece2,BoardReceived), Y1 is (Indexf-1), convert_to_letter(Y1,L), check_piece(L,Xf,Piece,BoardReceived));
-					(Dy = 2, Indexf < Indexi)-> (check_piece(Yf,Xf,Piece2,BoardReceived), Y1 is (Indexf+1), convert_to_letter(Y1,L), check_piece(L,Xf,Piece,BoardReceived))
+					(Dx = 1) -> (Piece2 is 3 ,  check_piece(Yf,Xf,Piece,BoardReceived));
+					(Dy = 1) -> (Piece2 is 3 , check_piece(Yf,Xf,Piece,BoardReceived));
+					(Dx = 2, Xf > Xi) -> (check_piece(Yf,Xf,Piece2,BoardReceived), X1 is (Xf-1), check_piece(Yf,X1,Piece,BoardReceived));
+					(Dx = 2, Xf < Xi) -> (check_piece(Yf,Xf,Piece2,BoardReceived), X1 is (Xf+1), check_piece(Yf,X1,Piece,BoardReceived));
+					(Dy = 2, Indexf > Indexi) -> (check_piece(Yf,Xf,Piece2,BoardReceived), Y1 is (Indexf-1), convert_to_letter(Y1,L), check_piece(L,Xf,Piece,BoardReceived));
+					(Dy = 2, Indexf < Indexi) -> (check_piece(Yf,Xf,Piece2,BoardReceived), Y1 is (Indexf+1), convert_to_letter(Y1,L), check_piece(L,Xf,Piece,BoardReceived))
 		).
 
 
@@ -433,19 +464,19 @@ play_1(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
 				Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,1,S1,S1f,S2,S2f);
 				Piece = drone -> move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,1,S1,S1f,S2,S2f);
 				Piece = queen -> move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,1,S1,S1f,S2,S2f);
-				Piece = vazio -> (write('Nothing to move on those coordenates. Insert new ones\n'),ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f))
+				Piece = vazio -> (write('Nothing to move on those coordenates. Insert new ones: \n'),ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f))
 				)).
 
 play_2(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
 				coordenates(Yi,Xi,Piece,BoardReceived),
 				convert(Yi,Num),
 				(
-				Num =< 4 -> (write('Not your piece'), ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f));
+				Num =< 4 -> (write('Not your piece! Insert new coordenates: \n'), ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f));
 				(
 				Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,2,S1,S1f,S2,S2f);
 				Piece = drone -> move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,2,S1,S1f,S2,S2f);
 				Piece = queen -> move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,2,S1,S1f,S2,S2f);
-				Piece = vazio -> (write('Nothing to move on those coordenates. Insert new ones\n'), ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f))
+				Piece = vazio -> (write('Nothing to move on those coordenates. Insert new ones: \n'), ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f))
 				)).
 
 verify_board_1(Board,Line,X) :-
@@ -492,7 +523,7 @@ ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
 				play_1(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,S1,S1f,S2,S2f).
 
 ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
-	write('Invalid coordenates, please insert new ones'), nl,
+	write('Invalid coordenates! Please insert new ones: '), nl,
 	ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f).
 
 ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
@@ -508,7 +539,7 @@ ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
 				play_2(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,S1,S1f,S2,S2f).
 
 ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
-				write('Invalid coordenates, please insert new ones'), nl,
+				write('Invalid coordenates! Please insert new ones: '), nl,
 				ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f).
 
 endGame(Board,X):-
@@ -556,3 +587,23 @@ replace( L , X , Y , Z , R ) :-
 				append(ColPfx,[Z|ColSfx],RowNew) ,
 				append(RowPfx,[RowNew|RowSfx],R)
 				.
+
+exists_on_line([Piece|_], Piece).
+
+exists_on_line([_|Line], Piece):-
+	  exists_on_line(Line, Piece)
+		.
+
+exists_on_board_half(Board, Player, Piece):-
+    exists_on_board_half(Board, Player, Piece, 1)
+		.
+
+exists_on_board_half(Board, PlayerNr, Piece, N):-
+	  N<4,
+	  LineNr is N + PlayerNr * 4,
+    nth1(LineNr, Board, Line),
+    exists_on_line(Line, Piece);
+    N<4,
+    N1 is N + 1,
+    exists_on_board_half(Board, PlayerNr, Piece, N1)
+		.
