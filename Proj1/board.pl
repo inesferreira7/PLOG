@@ -38,10 +38,9 @@ display_numbers([]).
 
 
 display_board([L1|LS], N) :-
-        nl,
         (
-        N = 4 -> (write('  ----------------\n'),nl, display_line(L1));
-        display_line(L1)),
+        N = 4 -> (write('   _______________\n'),nl, display_line(L1));
+        (write('   ---------------\n'),display_line(L1))),
         N1 is N+1,
         nl,
         display_board(LS, N1)
@@ -239,22 +238,6 @@ move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P):-
 				(P1 = 3 , P2 = 3 )-> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), display_all(BoardOutput)
 				)
 
-
-				/**(
-				(P1 = 1 ; P2 = 1 ) -> (write('The path has pieces of player 1! Insert new coordenates. \n'),
-				(
-				P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput);
-				P = 2 -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), display_all(BoardOutput)
-				)
-				);
-				(P1 = 2 ; P2 = 2 ) -> (write('The path has pieces of player 2! Insert new coordenates. \n'),
-				(
-				P = 1 -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), display_all(BoardOutput);
-				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput)
-				)
-				);
-				(P1 = 3 , P2 = 3 )-> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), display_all(BoardOutput)
-				)**/
 				);
 				CanMove = 1 -> write('Impossible movement for the drone, it will not move! Insert new coordenates. \n'),
 				(
@@ -511,11 +494,20 @@ endGame(Board,X):-
 
 isPar(N):- N mod 2 =:= 0.
 
-start_game(N):-
+display_scores(S1,S2):-
+				nl,
+				write('Player 1: '),
+				write(S1), nl,
+				write('Player 2: '),
+				write(S2),nl.
+
+
+start_game(N,S1,S2):-
 	board1vazio(Board),
 	display_all(Board),
-	make_play(N,Board)
-	.
+	display_scores(S1,S2),
+	make_play(N,Board).
+
 
 	make_play(N,Board):-
 			endGame(Board,X),
