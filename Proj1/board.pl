@@ -5,8 +5,8 @@ board([
 			[a,queen,queen,drone,vazio],
 			[b,queen,drone,pawn,vazio],
 			[c,drone,pawn,pawn,vazio],
-			[d,vazio,vazio,vazio,vazio],
-      [e,vazio,vazio,vazio,vazio],
+			[d,queen,vazio,vazio,vazio],
+      [e,queen,vazio,vazio,vazio],
       [f,vazio,pawn,pawn,drone],
       [g,vazio,pawn,drone,queen],
       [h,vazio,drone,queen,queen]
@@ -210,7 +210,7 @@ move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P):-
 				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput)
 				)
 				);
-				X = 2 -> (write('The path has pieces of player 1! Insert new coordenates. \n'),
+				X = 2 -> (write('The path has pieces of player 2! Insert new coordenates. \n'),
 				(
 				P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput);
 				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput)
@@ -277,12 +277,15 @@ move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P):-
 				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput)
 				)
 				);
-				Move = 2 ->(write('The path has pieces of player 1! Insert new coordenates. \n'),
-				(
-				P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput);
-				P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput)
-				)
+				Move = 2 ->(write('siga comer uma pecita!'), make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput)
 				);
+
+				%(write('The path has pieces of player 2! Insert new coordenates. \n'),
+				%(
+				%P = 1 -> ask_coordenates_1(BoardReceived,BoardOutput);
+				%P = 2 -> ask_coordenates_2(BoardReceived,BoardOutput)
+				%)
+				%);
 				Move = 3 -> make_move(Xi,Yi,Xf,Yf,queen,BoardReceived,BoardOutput), display_all(BoardOutput)
 				)
 				);
@@ -296,6 +299,9 @@ move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P):-
 				write('That piece you selected is not a queen, you can not move it! ')
 				)
 				.
+
+
+
 
 check_path_queen(Xi,Yi,Xf,Yf,Move,BoardReceived):-
 				convert(Yi,Indexi),
@@ -491,6 +497,7 @@ isPar(N):- N mod 2 =:= 0.
 
 start_game(N):-
 	board(Board),
+	display_all(Board),
 	make_play(N,Board)
 	.
 
