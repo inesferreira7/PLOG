@@ -6,28 +6,17 @@ board([
 			[b,queen,drone,pawn,vazio],
 			[c,drone,pawn,pawn,vazio],
 			[d,queen,vazio,vazio,vazio],
-      [e,queen,vazio,vazio,vazio],
+      [e,vazio,vazio,vazio,vazio],
       [f,vazio,pawn,pawn,drone],
       [g,vazio,pawn,drone,queen],
       [h,vazio,drone,queen,queen]
 			]).
 
-board1vazio([
+		board1vazio([
 			[a,vazio,vazio,vazio,vazio],
 			[b,vazio,vazio,vazio,vazio],
 			[c,vazio,vazio,vazio,vazio],
-			[d,vazio,vazio,vazio,vazio],
-			[e,vazio,vazio,vazio,vazio],
-			[f,vazio,pawn,pawn,drone],
-			[g,vazio,pawn,drone,queen],
-			[h,vazio,drone,queen,queen]
-			]).
-
-board2vazio([
-			[a,queen,queen,drone,vazio],
-			[b,queen,drone,pawn,vazio],
-			[c,drone,pawn,pawn,vazio],
-			[d,vazio,vazio,vazio,vazio],
+			[d,drone,vazio,vazio,vazio],
 			[e,vazio,vazio,vazio,vazio],
 			[f,vazio,pawn,pawn,drone],
 			[g,vazio,pawn,drone,queen],
@@ -430,7 +419,7 @@ play_2(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
 
 verify_board_1(Board,Line,X) :-
 				(
-				Line = 5 -> X=1 %se x=1 quer dizer que está vazio
+				Line = 5 ->X=2 %player 2 ganhou porque o board1 esta vazio
 				);
 				nth1(Line,Board,Elem),
 				removehead(Elem,Elem1),
@@ -441,9 +430,11 @@ verify_board_1(Board,Line,X) :-
 				verify_board_1(Board,Line1,X)
 				).
 
+verify_board_1(Board,Line,X).
+
 verify_board_2(Board,Line,X) :-
 				(
-				Line = 9 -> X=1 %se x=1 quer dizer que está vazio
+				Line = 9 -> X=1 %player 1 ganhou porque o board2 esta vazio
 				);
 				nth1(Line,Board,Elem),
 				removehead(Elem,Elem1),
@@ -451,8 +442,10 @@ verify_board_2(Board,Line,X) :-
 				Elem1 \= [vazio,vazio,vazio,vazio] -> X = 0
 				;
 				Line1 is (Line + 1),
-				verify_board_1(Board,Line1,X)
+				verify_board_2(Board,Line1,X)
 				).
+
+verify_board_2(Board,Line,X).
 
 
 ask_coordenates_1(BoardReceived,BoardOutput):-
@@ -488,26 +481,32 @@ ask_coordenates_2(BoardReceived,BoardOutput):-
 				ask_coordenates_2(BoardReceived,BoardOutput).
 
 endGame(Board,X):-
-			verify_board_1(Board,1,X),
-			(X = 1 -> write('Player 2 win!!')),
-			verify_board_2(Board,5,Y),
-			(Y = 1 -> write('Player 1 win!!')).
+				verify_board_1(Board,1,X),
+				verify_board_2(Board,5,X).
 
 isPar(N):- N mod 2 =:= 0.
 
 start_game(N):-
-	board(Board),
+	board1vazio(Board),
 	display_all(Board),
 	make_play(N,Board)
 	.
 
-make_play(N,Board):-
-		N1 is N+1,
-		(
-		isPar(N1) -> (print_turn1,ask_coordenates_1(Board,BoardOutput));
-		(print_turn2,ask_coordenates_2(Board,BoardOutput))
-		),
-		make_play(N1,BoardOutput).
+	make_play(N,Board):-
+			endGame(Board,X),
+			(
+			(
+			X = 1 -> print_winner1;
+			X = 2 -> print_winner2
+			);
+			(
+			N1 is N+1,
+			(
+			isPar(N1) -> (print_turn1,ask_coordenates_1(Board,BoardOutput));
+			(print_turn2,ask_coordenates_2(Board,BoardOutput))
+			),
+			make_play(N1,BoardOutput))
+			).
 
 replace( L , X , Y , Z , R ) :-
 				append(RowPfx,[Row|RowSfx],L),

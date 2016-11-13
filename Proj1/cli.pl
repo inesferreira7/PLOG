@@ -83,10 +83,26 @@ print_turn1:-
         write('%%         Player 1 TURN         %%\n'),
         write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n').
 
-        %%%%%%%%%%%% Print of player 1 turn %%%%%%%%%%%%
+%%%%%%%%%%%% Print of player 1 turn %%%%%%%%%%%%
 
 print_turn2:-
         nl,
         write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n'),
         write('%%         Player 2 TURN         %%\n'),
+        write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n').
+
+%%%%%%%%%%%% Print of player 1 turn %%%%%%%%%%%%
+
+print_winner1:-
+        nl,
+        write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n'),
+        write('%%         Player 1 WIN          %%\n'),
+        write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n').
+
+%%%%%%%%%%%% Print of player 1 turn %%%%%%%%%%%%
+
+print_winner2:-
+        nl,
+        write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n'),
+        write('%%         Player 2 WIN          %%\n'),
         write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n').
