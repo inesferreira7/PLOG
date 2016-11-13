@@ -14,10 +14,10 @@ board([
 
 		board1vazio([
 			[a,vazio,vazio,vazio,vazio],
-			[b,vazio,vazio,vazio,vazio],
+			[b,vazio,drone,vazio,vazio],
 			[c,vazio,vazio,vazio,vazio],
-			[d,drone,vazio,vazio,vazio],
-			[e,vazio,vazio,vazio,vazio],
+			[d,drone,vazio,pawn,vazio],
+			[e,drone,pawn,vazio,vazio],
 			[f,vazio,pawn,pawn,drone],
 			[g,vazio,pawn,drone,queen],
 			[h,vazio,drone,queen,queen]
@@ -217,8 +217,29 @@ move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P):-
 				write('That piece you selected is not a pawn, you can not move it! ')
 				).
 
-move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P):-
+update_score1(S1,Piece,S1f,S2,S2f):-
+				S2f is (S2 + 0),
+				(
+				Piece = queen -> S1f is (S1 + 3);
+				Piece = drone -> S1f is (S1 + 2);
+				Piece = pawn -> S1f is (S1 +1)
+				).
+
+update_score2(S2,Piece,S2f,S1,S1f):-
+				S1f is (S1 + 0),
+				(
+				Piece = queen -> S2f is (S2 + 3);
+				Piece = drone -> S2f is (S2 + 2);
+				Piece = pawn -> S2f is (S2 + 1)
+				).
+
+update_score_vazio(S1,S2,S1f,S2f):-
+				S1f = S1,
+				S2f = S2.
+
+move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P,S1,S1f,S2,S2f):-
 				coordenates(Yi,Xi,InitialPiece,BoardReceived),
+				coordenates(Yf,Xf,FinalPiece,BoardReceived),
 				convert(Yi, Indexi),
 				convert(Yf, Indexf),
 				(
@@ -228,14 +249,14 @@ move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,P):-
 				check_path_drone(Xi,Yi,Xf,Yf,P1,P2,BoardReceived),(NewY is abs(Indexf - 1)),
 				(
 				(P = 1 , P1 = 1 ) -> write('The path has pieces of player 1! Insert new coordenates. \n'), ask_coordenates_1(BoardReceived,BoardOutput);
-				(P = 1 , P1 = 2 , NewY = Indexi ) -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), display_all(BoardOutput);
+				(P = 1 , P1 = 2 , NewY = Indexi ) -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score1(S1,FinalPiece,S1f,S2,S2f),display_all(BoardOutput);
 				(P = 1 , P1 = 2 , NewY > Indexi ) -> write('The path has pieces of player 2! Insert new coordenates. \n'), ask_coordenates_1(BoardReceived,BoardOutput);
 
 				(P = 2 , P1 = 2) -> write('The path has pieces of player 2! Insert new coordenates. \n'), ask_coordenates_2(BoardReceived,BoardOutput);
-				(P = 2 , P1 = 1 , NewY = Indexi ) -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), display_all(BoardOutput);
+				(P = 2 , P1 = 1 , NewY = Indexi ) -> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score2(S2,FinalPiece,S2f,S1,S1f),display_all(BoardOutput);
 				(P = 2 , P1 = 1 , NewY > Indexi ) -> write('The path has pieces of player 1! Insert new coordenates. \n'), ask_coordenates_2(BoardReceived,BoardOutput);
 
-				(P1 = 3 , P2 = 3 )-> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), display_all(BoardOutput)
+				(P1 = 3 , P2 = 3 )-> make_move(Xi,Yi,Xf,Yf,drone,BoardReceived,BoardOutput), update_score_vazio(S1,S2,S1f,S2f),display_all(BoardOutput)
 				)
 
 				);
@@ -401,28 +422,28 @@ check_path_drone(Xi,Yi,Xf,Yf,Piece, Piece2,BoardReceived):-
 		).
 
 
-play_1(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
+play_1(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
 				coordenates(Yi,Xi,Piece,BoardReceived),
 				convert(Yi,Num),
 				(
-				Num > 4 -> write('Not your piece');
+				Num > 4 -> (write('Not your piece! Insert new coordenates: \n'),ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f));
 				(
 				Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,1);
-				Piece = drone -> move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,1);
+				Piece = drone -> move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,1,S1,S1f,S2,S2f);
 				Piece = queen -> move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,1);
-				Piece = vazio -> (write('Nothing to move on those coordenates. Insert new ones\n'),ask_coordenates_1(BoardReceived,BoardOutput))
+				Piece = vazio -> (write('Nothing to move on those coordenates. Insert new ones\n'),ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f))
 				)).
 
-play_2(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput):-
+play_2(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
 				coordenates(Yi,Xi,Piece,BoardReceived),
 				convert(Yi,Num),
 				(
-				Num =< 4 -> write('Not your piece');
+				Num =< 4 -> (write('Not your piece'), ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f));
 				(
 				Piece = pawn -> move_pawn(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,2);
-				Piece = drone -> move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,2);
+				Piece = drone -> move_drone(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,2,S1,S1f,S2,S2f);
 				Piece = queen -> move_queen(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,2);
-				Piece = vazio -> (write('Nothing to move on those coordenates. Insert new ones\n'), ask_coordenates_2(BoardReceived,BoardOutput))
+				Piece = vazio -> (write('Nothing to move on those coordenates. Insert new ones\n'), ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f))
 				)).
 
 verify_board_1(Board,Line,X) :-
@@ -456,7 +477,7 @@ verify_board_2(Board,Line,X) :-
 verify_board_2(Board,Line,X).
 
 
-ask_coordenates_1(BoardReceived,BoardOutput):-
+ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
 				write('Initial x:'), nl,
 				read(Xi),
 				write('Initial y:'), nl,
@@ -466,13 +487,13 @@ ask_coordenates_1(BoardReceived,BoardOutput):-
 				write('Final y:'), nl,
 				read(Yf),
 				inside_board(Xi,Yi,Xf,Yf),
-				play_1(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput).
+				play_1(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,S1,S1f,S2,S2f).
 
-ask_coordenates_1(BoardReceived,BoardOutput):-
+ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
 	write('Invalid coordenates, please insert new ones'), nl,
-	ask_coordenates_1(BoardReceived,BoardOutput).
+	ask_coordenates_1(BoardReceived,BoardOutput,S1,S1f,S2,S2f).
 
-ask_coordenates_2(BoardReceived,BoardOutput):-
+ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
 				write('Initial x:'), nl,
 				read(Xi),
 				write('Initial y:'), nl,
@@ -482,11 +503,11 @@ ask_coordenates_2(BoardReceived,BoardOutput):-
 				write('Final y:'), nl,
 				read(Yf),
 				inside_board(Xi,Yi,Xf,Yf),
-				play_2(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput).
+				play_2(Xi,Yi,Xf,Yf,BoardReceived,BoardOutput,S1,S1f,S2,S2f).
 
-ask_coordenates_2(BoardReceived,BoardOutput):-
+ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f):-
 				write('Invalid coordenates, please insert new ones'), nl,
-				ask_coordenates_2(BoardReceived,BoardOutput).
+				ask_coordenates_2(BoardReceived,BoardOutput,S1,S1f,S2,S2f).
 
 endGame(Board,X):-
 				verify_board_1(Board,1,X),
@@ -506,10 +527,10 @@ start_game(N,S1,S2):-
 	board1vazio(Board),
 	display_all(Board),
 	display_scores(S1,S2),
-	make_play(N,Board).
+	make_play(N,Board,S1,S2).
 
 
-	make_play(N,Board):-
+	make_play(N,Board,S1,S2):-
 			endGame(Board,X),
 			(
 			(
@@ -519,10 +540,10 @@ start_game(N,S1,S2):-
 			(
 			N1 is N+1,
 			(
-			isPar(N1) -> (print_turn1,ask_coordenates_1(Board,BoardOutput));
-			(print_turn2,ask_coordenates_2(Board,BoardOutput))
+			isPar(N1) -> (print_turn1,ask_coordenates_1(Board,BoardOutput,S1,S1f,S2,S2f), display_scores(S1f,S2f));
+			(print_turn2,ask_coordenates_2(Board,BoardOutput,S1,S1f,S2,S2f), display_scores(S1f,S2f))
 			),
-			make_play(N1,BoardOutput))
+			make_play(N1,BoardOutput,S1f,S2f))
 			).
 
 replace( L , X , Y , Z , R ) :-
