@@ -70,22 +70,14 @@ board_vertical(Board, Horizontal, N):-
   N1 is N - 1,
   board_vertical(Board, Horizontal, N1).
 
+
 board_vertical(Board, Horizontal, N):-
-  get_col(Board, N, Col),
+  select_list(Board,1,N,Col),
   element(N, Horizontal, ColSum),
   domain(Col, 0, 1),
   sum(Col, #=, ColSum),
   N1 is N - 1,
   board_vertical(Board, Horizontal, N1).
-
-get_col([Head|Tail], N, List):-
-  element(N, Head, Val),
-  append(List, [Val], NewList),
-  get_col(Tail,N,NewList).
-
-get_col([],_,_).
-
-
 
 flatten([],[]).
 flatten([LH|LT], Flattened) :-
@@ -100,9 +92,9 @@ flatten([LH | LT], [LH | FlattenedT]) :-
 
 solve(Board,Vertical,Horizontal):-
   length(Board,Length),
-  board_vertical(Board, Horizontal,Length),
   fill_board(Board,Vertical,Length),
-
-  flatten(Board,BoardFlat),
+  transpose(Board,Bo),
+  board_vertical(Bo,Horizontal,Length),
+  flatten(Bo,BoardFlat),
   labeling([],BoardFlat),
   write(BoardFlat).
