@@ -13,6 +13,7 @@ board_1([
           ]).
 
 vertical([5,5,-1,4,-1,4,-1]).
+horizontal([-1,3,-1,-1,-1,5,-1]).
 
 fill_board(_,_,0).
 
@@ -20,7 +21,7 @@ fill_board(Board,Vertical,N):-
   element(N,Vertical,LineSum),
   LineSum #= -1,
   N1 is N - 1,
-  fill_board(Board,Vertical,N1).
+  fill_board(Board,Vertical, N1).
 
 
 fill_board(Board,Vertical,N):-
@@ -40,6 +41,31 @@ select_list([Head|_], N, N, Head).
 
 select_list([],_,_,[]).
 
+board_vertical(_,_,0).
+
+board_vertical(Board, Horizontal, N):-
+  element(N, Horizontal, ColSum),
+  ColSum #= -1,
+  N1 is N - 1,
+  board_vertical(Board, Horizontal, N1).
+
+board_vertical(Board, Horizontal, N):-
+  get_col(Board, N, Col),
+  element(N, Horizontal, ColSum),
+  domain(Col, 0, 1),
+  sum(Col, #=, ColSum),
+  N1 is N - 1,
+  board_vertical(Board, Horizontal, N1).
+
+get_col([Head|Tail], N, List):-
+  element(N, Head, Val),
+  append(List, [Val], NewList),
+  get_col(Tail,N,NewList).
+
+get_col([],_,_).
+
+
+
 flatten([],[]).
 flatten([LH|LT], Flattened) :-
 	is_list(LH),
@@ -51,9 +77,10 @@ flatten([LH | LT], [LH | FlattenedT]) :-
 	\+is_list(LH),
 	flatten(LT, FlattenedT).
 
-solve(Board,Vertical,Length):-
+solve(Board,Vertical,Horizontal,Length):-
   length(Board,Length),
   fill_board(Board,Vertical,Length),
+  board_vertical(Board, Horizontal,Length),
   flatten(Board,BoardFlat),
   labeling([],BoardFlat),
   write(BoardFlat).
