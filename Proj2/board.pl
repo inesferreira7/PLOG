@@ -14,16 +14,16 @@ board_1([
 
 
 board_2([
-        [P1,P1,P1,P1,P2,P2,P2,P3,P3,P4],
-        [P5,P5,P1,P1,P2,P2,P2,P3,P3,P4],
-        [P6,P7,P7,P8,P8,P8,P3,P3,P3,P4],
-        [P6,P7,P9,P9,P9,P8,P8,P10,P11,P4],
-        [P7,P7,P9,P9,P12,P12,P8,P10,P11,P13],
-        [P7,P7,P16,P16,P12,P14,P15,P15,P13,P13],
-        [P15,P15,P16,P16,P16,P14,P17,P17,P17,P17],
-        [P15,P15,P16,P18,P14,P14,P19,P17,P17,P17],
-        [P20,P20,P16,P18,P14,P14,P19,P21,P21,P22],
-        [P20,P20,P20,P18,P23,P23,P23,P23,P23,P22]
+        [P1,P1,P2,P2,P2,P3,P3,P4,P4,P4],
+        [P1,P1,P6,P2,P8,P8,P3,P4,P9,P4],
+        [P5,P6,P6,P7,P8,P3,P3,P9,P9,P9],
+        [P5,P10,P7,P7,P8,P8,P14,P14,P9,P16],
+        [P10,P10,P11,P12,P13,P13,P14,P15,P15,P16],
+        [P10,P11,P11,P12,P13,P13,P14,P15,P16,P16],
+        [P10,P17,P12,P12,P20,P20,P22,P22,P16,P24],
+        [P17,P17,P17,P19,P19,P20,P22,P23,P23,P24],
+        [P18,P17,P18,P19,P20,P20,P21,P23,P25,P25],
+        [P18,P18,P18,P19,P19,P21,P21,P21,P25,P25]
         ]).
 
 
@@ -31,8 +31,8 @@ board_2([
 vertical_1([5,5,-1,4,-1,4,-1]).
 horizontal_1([-1,3,-1,-1,-1,5,-1]).
 
-vertical_2([-1,-1,-1,4,4,3,-1,-1,-1,8]).
-horizontal_2([7,-1,-1,5,-1,-1,5,6,-1,-1]).
+vertical_2([5,5,6,6,-1,5,5,-1,5,5]).
+horizontal_2([6,6,-1,-1,-1,-1,-1,-1,4,4]).
 
 
 fill_board(_,_,0).
@@ -100,8 +100,8 @@ flatten([LH | LT], [LH | FlattenedT]) :-
 
 solve(Board,Vertical,Horizontal):-
   length(Board,Length),
-  fill_board(Board,Vertical,Length),
   board_vertical(Board,Horizontal,Length),
+  fill_board(Board,Vertical,Length),
   flatten(Board,BoardFlat),
   labeling([],BoardFlat),
   write(BoardFlat).
