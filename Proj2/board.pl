@@ -56,6 +56,9 @@ vertical_3([9,8,10,6,4,6,9,6,6,6,4,12,7,4,10]).
 horizontal_3([-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]).
 
 
+
+
+
 fill_board(_,_,0).
 
 fill_board(Board,Vertical,N):-
@@ -119,10 +122,9 @@ flatten([LH | LT], [LH | FlattenedT]) :-
 	\+is_list(LH),
 	flatten(LT, FlattenedT).
 
-solve(Board,Vertical,Horizontal):-
+solve(Board,Vertical,Horizontal,BoardFlat):-
   length(Board,Length),
   board_vertical(Board,Horizontal,Length),
   fill_board(Board,Vertical,Length),
   flatten(Board,BoardFlat),
-  labeling([],BoardFlat),
-  write(BoardFlat).
+  labeling([],BoardFlat).
