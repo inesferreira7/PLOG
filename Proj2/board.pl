@@ -46,14 +46,14 @@ board_3([
 
 
 
-vertical_1([5,5,-1,4,-1,4,-1]).
-horizontal_1([-1,3,-1,-1,-1,5,-1]).
+horizontal_1([5,5,-1,4,-1,4,-1]).
+vertical_1([-1,3,-1,-1,-1,5,-1]).
 
-vertical_2([5,5,6,6,-1,5,5,-1,5,5]).
-horizontal_2([6,6,-1,-1,-1,-1,-1,-1,4,4]).
+horizontal_2([5,5,6,6,-1,5,5,-1,5,5]).
+vertical_2([6,6,-1,-1,-1,-1,-1,-1,4,4]).
 
-vertical_3([9,8,10,6,4,6,9,6,6,6,4,12,7,4,10]).
-horizontal_3([-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]).
+horizontal_3([9,8,10,6,4,6,9,6,6,6,4,12,7,4,10]).
+vertical_3([-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]).
 
 
 
@@ -131,8 +131,8 @@ flatten([LH | LT], [LH | FlattenedT]) :-
 
 solve(Board,Vertical,Horizontal,BoardFlat):-
   length(Board,Length),
-  board_vertical(Board,Horizontal,Length),
-  board_horizontal(Board,Vertical,Length),
+  board_vertical(Board,Vertical,Length),
+  board_horizontal(Board,Horizontal,Length),
   flatten(Board,BoardFlat),
   reset_timer,
   labeling([],BoardFlat),

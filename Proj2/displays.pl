@@ -46,43 +46,43 @@ initial_3([
         [p28,p28,p29,p29,p33,p33,p33,p32,p34,p41,p41,p41,p35,p42,p42]
         ]).
 
-display_horizontal(H,N,N1):-
+display_vertical(V,N,N1):-
   N#>=N1,
-  element(N1,H,Number),
+  element(N1,V,Number),
   (
   Number = -1 -> write('     ');
   write(Number), write('    ')
   ),
   N2 is N1 +1,
-  display_horizontal(H,N,N2).
+  display_vertical(V,N,N2).
 
-display_horizontal(H,N,N1):-
+display_vertical(V,N,N1):-
   nl.
 
-display_horizontal([],_,_).
+display_vertical([],_,_).
 
 
 
-display_horizontal_final(H,N,N1):-
+display_vertical_final(V,N,N1):-
   N#>=N1,
-  element(N1,H,Number),
+  element(N1,V,Number),
   (
   Number = -1 -> write('    ');
   write(Number), write('   ')
   ),
   N2 is N1 +1,
-  display_horizontal_final(H,N,N2).
+  display_vertical_final(V,N,N2).
 
-display_horizontal_final(H,N,N1):-
+display_vertical_final(V,N,N1):-
   nl.
 
-display_horizontal_final([],_,_).
+display_vertical_final([],_,_).
 
 
 
-display_initial_board(Board,N,N1,V):-
+display_initial_board(Board,N,N1,H):-
   N#>=N1,
-  element(N1,V,Number),
+  element(N1,H,Number),
   (
   Number = -1 -> write(' '), write(' | ');
   Number >= 10 ->write(Number), write('| ');
@@ -92,9 +92,9 @@ display_initial_board(Board,N,N1,V):-
   display_line(Row),
   nl,
   N2 is N1+1,
-  display_initial_board(Board,N,N2,V).
+  display_initial_board(Board,N,N2,H).
 
-display_initial_board(Board,N,N1,V):-
+display_initial_board(Board,N,N1,H):-
   nl.
 display_initial_board([],_,_,[]).
 
@@ -108,9 +108,9 @@ display_line2([E1|ES]) :-  write(E1), write(' | '), display_line2(ES).
 
 display_line2([]).
 
-display_final_board(Board,N,N1,V,Total,Counter,Lstart,Llen):-
+display_final_board(Board,N,N1,H,Total,Counter,Lstart,Llen):-
   Total#>=Counter,
-  element(N1,V,Number),
+  element(N1,H,Number),
   (
   Number = -1 -> write(' '), write(' | ');
   Number >= 10 ->write(Number), write('| ');
@@ -122,9 +122,9 @@ display_final_board(Board,N,N1,V,Total,Counter,Lstart,Llen):-
   N2 is N1+1,
   Counter1 is Counter +Llen,
   Lstart1 is Lstart +Llen,
-  display_final_board(Board,N,N2,V,Total,Counter1,Lstart1,Llen).
+  display_final_board(Board,N,N2,H,Total,Counter1,Lstart1,Llen).
 
-  display_final_board(Board,N,N1,V,Total,Counter,Lstart,Llen):-
+  display_final_board(Board,N,N1,H,Total,Counter,Lstart,Llen):-
     nl.
   display_final_board([],_,_,[],_,_,_,_).
 
@@ -139,7 +139,7 @@ show_initial_board(Board,N,N1,V,H):-
   write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n'),
   nl,
   write('    '),
-  display_horizontal(H,N,N1),
+  display_vertical(V,N,N1),
   display_initial_board(Board,N,N1,V).
 
 show_final_board(Board,V,H,N,N1,Lstart,Llen,Total,Counter):-
@@ -151,8 +151,8 @@ show_final_board(Board,V,H,N,N1,Lstart,Llen,Total,Counter):-
   write('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n'),
   nl,
   write('    '),
-  display_horizontal_final(H,N,N1),
-  display_final_board(Board,N,N1,V,Total,Counter,Lstart,Llen).
+  display_vertical_final(V,N,N1),
+  display_final_board(Board,N,N1,H,Total,Counter,Lstart,Llen).
 
 
 
