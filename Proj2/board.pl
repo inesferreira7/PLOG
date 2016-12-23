@@ -59,22 +59,22 @@ horizontal_3([-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]).
 
 
 
-fill_board(_,_,0).
+board_horizontal(_,_,0).
 
-fill_board(Board,Vertical,N):-
+board_horizontal(Board,Vertical,N):-
   element(N,Vertical,LineSum),
   LineSum #= -1,
   N1 is N - 1,
-  fill_board(Board,Vertical, N1).
+  board_horizontal(Board,Vertical, N1).
 
 
-fill_board(Board,Vertical,N):-
+board_horizontal(Board,Vertical,N):-
   select_list(Board, 1, N, List),
   element(N, Vertical, LineSum),
   domain(List,0,1),
   sum(List,#=,LineSum),
   N1 is N - 1,
-  fill_board(Board,Vertical,N1).
+  board_horizontal(Board,Vertical,N1).
 
 select_list([Head|Tail], N1, N, List):-
   N1 #\= N,
@@ -122,9 +122,19 @@ flatten([LH | LT], [LH | FlattenedT]) :-
 	\+is_list(LH),
 	flatten(LT, FlattenedT).
 
+  reset_timer :- statistics(walltime,_).
+  print_time :-
+  	statistics(walltime,[_,T]),
+  	TS is ((T//10)*10)/1000,
+  	nl, write('Time: '), write(TS), write('s'), nl, nl.
+
+
 solve(Board,Vertical,Horizontal,BoardFlat):-
   length(Board,Length),
   board_vertical(Board,Horizontal,Length),
-  fill_board(Board,Vertical,Length),
+  board_horizontal(Board,Vertical,Length),
   flatten(Board,BoardFlat),
-  labeling([],BoardFlat).
+  reset_timer,
+  labeling([],BoardFlat),
+  print_time,
+  fd_statistics.
